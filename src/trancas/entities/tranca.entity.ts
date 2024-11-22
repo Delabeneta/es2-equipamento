@@ -9,4 +9,6 @@ export class tranca {
   localizacao: string;
   anoFabricacao: number;
   modelo: string;
+   
+  
 }
