@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { config } from './ormconfig';
-import { FuncionariosModule } from './funcionarios/funcionarios.module';
+import { AppController } from '../app/app.controller';
+import { AppService } from '../app/app.service';
+import { config } from '../ormconfig';
+import { FuncionariosModule } from '../funcionarios/funcionarios.module';
 
 @Module({
   imports: [FuncionariosModule, TypeOrmModule.forRoot(config)],
