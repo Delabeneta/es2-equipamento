@@ -1,8 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+//decorators do class-validator. Definem Regras de validacao 
+
 
 export class CreateTrancaDto {
-  @IsNotEmpty()
+  @IsNotEmpty() 
   @IsString()
   numero: string;
 

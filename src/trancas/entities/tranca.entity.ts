@@ -2,7 +2,7 @@
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class tranca {
+export class Tranca {
   @PrimaryGeneratedColumn('increment')
   numero: string;
   status: 'nova' | 'livre' | 'ocupada' | 'EM_REPARO' | 'APOSENTADA';

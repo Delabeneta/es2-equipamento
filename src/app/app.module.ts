@@ -4,10 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from '../app/app.controller';
 import { AppService } from '../app/app.service';
 import { config } from '../ormconfig';
-import { FuncionariosModule } from '../funcionarios/funcionarios.module';
+import { BicicletasModule } from 'src/bicicletas/bicicletas.module';
 
 @Module({
-  imports: [FuncionariosModule, TypeOrmModule.forRoot(config)],
+  imports: [BicicletasModule, TypeOrmModule.forRoot(config)],
   controllers: [AppController],
   providers: [AppService],
 })

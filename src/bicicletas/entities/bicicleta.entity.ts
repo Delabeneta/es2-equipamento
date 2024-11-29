@@ -2,7 +2,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class bicicleta {
+export class Bicicleta {
   @PrimaryGeneratedColumn('increment')
   numero: number;
 

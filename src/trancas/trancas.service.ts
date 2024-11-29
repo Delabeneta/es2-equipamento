@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
-import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
-import { UpdateFuncionarioDto } from './dto/update-funcionario.dto';
-import { Funcionario } from './entities/funcionario.entity';
+import { CreateTrancaDto } from './dto/create-Tranca.dto';
+import { UpdateTrancaDto } from './dto/update-Tranca.dto';
+import { Tranca } from './entities/tranca.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -15,29 +15,29 @@ import { Repository } from 'typeorm';
 
 
 @Injectable()
-export class FuncionariosService {
+export class TrancasService {
   constructor( 
-      @InjectRepository(Funcionario)
-      private funcionarioRepository: Repository<Funcionario>,
+      @InjectRepository(Tranca)
+      private trancaRepository: Repository<Tranca>,
   ) {}
 
-  create(createFuncionarioDto: CreateFuncionarioDto) {
-    return this.funcionarioRepository.save(createFuncionarioDto);
+  create(createTrancaDto: CreateTrancaDto) {
+    return this.trancaRepository.save(createTrancaDto);
   } // 
 
   findAll() {
-    return `This action returns all funcionarios`;
+    return `This action returns all Tranca`;
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} funcionario`;
+    return `This action returns a #${id} Tranca`;
   }
 
-  update(id: number, updateFuncionarioDto: UpdateFuncionarioDto) {
-    return `This action updates a #${id} funcionario`;
+  update(id: number, updateTrancaDto: UpdateTrancaDto) {
+    return `This action updates a #${id} Tranca`;
   }
 
   remove(id: number) {
-    return `This action removes a #${id} funcionario`;
+    return `This action removes a #${id} Tranca`;
   }
 }

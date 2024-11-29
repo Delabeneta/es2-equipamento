@@ -1,35 +1,35 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { FuncionariosService } from './trancas.service';
-import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
-import { UpdateFuncionarioDto } from './dto/update-funcionario.dto';
+import { TrancasService } from './trancas.service';
+import { CreateTrancaDto } from './dto/create-tranca.dto';
+import { UpdateTrancaDto } from './dto/update-tranca.dto';
 
-@Controller('funcionarios')
-export class FuncionariosController {
-  constructor(private readonly funcionariosService: FuncionariosService) {}
+@Controller('Trancas')
+export class TrancasController {
+  constructor(private readonly trancasService: TrancasService) {}
 
   @Post()
-  create(@Body() createFuncionarioDto: CreateFuncionarioDto) {
-    return this.funcionariosService.create(createFuncionarioDto);
+  create(@Body() createTrancaDto: CreateTrancaDto) {
+    return this.trancasService.create(createTrancaDto);
   }
 
   @Get()
   findAll() {
-    return this.funcionariosService.findAll();
+    return this.trancasService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.funcionariosService.findOne(+id);
+    return this.trancasService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFuncionarioDto: UpdateFuncionarioDto) {
-    return this.funcionariosService.update(+id, updateFuncionarioDto);
+  update(@Param('id') id: string, @Body() updateTrancaDto: UpdateTrancaDto) {
+    return this.trancasService.update(+id, updateTrancaDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.funcionariosService.remove(+id);
+    return this.trancasService.remove(+id);
   }
 }
