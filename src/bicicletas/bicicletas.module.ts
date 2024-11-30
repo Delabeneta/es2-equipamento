@@ -1,12 +1,23 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { BicicletasService } from './bicicletas.service';
 import { BicicletasController } from './bicicletas.controller';
-import { Bicicleta } from './entities/bicicleta.entity';
+import { BicicletaEntity } from './entities/bicicleta.entity';
+import { DataSource } from 'typeorm';
+import { TypeormBicicletaRepository } from './infra/persistence/repositories/typeorm-bicicleta.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Bicicleta])], // conf do typeorm para incluir entidade funcionario
-  providers: [BicicletasService],
-  controllers: [BicicletasController]
+  providers: [
+    BicicletasService,
+    {
+      provide: 'BicicletaRepository',
+      inject: [DataSource],
+      useFactory: (dataSource: DataSource) => {
+        return new TypeormBicicletaRepository(
+          dataSource.getRepository(BicicletaEntity),
+        );
+      },
+    },
+  ],
+  controllers: [BicicletasController],
 })
 export class BicicletasModule {}

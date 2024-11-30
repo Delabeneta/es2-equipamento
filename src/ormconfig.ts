@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { DataSourceOptions } from 'typeorm';
 
 export const config: DataSourceOptions = {

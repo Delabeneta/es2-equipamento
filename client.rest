@@ -1,0 +1,28 @@
+
+
+@baseurl = http://localhost:3000
+
+
+# Bicicletas
+
+Get {{baseurl}}/bicicletas/
+###
+PUT {{baseurl}}/bicicletas/3/
+Content-Type: application/json
+
+{   
+    "ano": "2025",
+    "modelo": "monarc",
+    "marca": "vermelho"
+}
+
+
+###
+POST {{baseurl}}/bicicletas/
+Content-Type: application/json
+
+{   
+    "ano": "2024",
+    "modelo": "bmx",
+    "marca": "azul"
+}

@@ -1,10 +1,10 @@
-/* eslint-disable prettier/prettier */
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BicicletaStatus } from '../domain/bicicleta';
 
-@Entity()
-export class Bicicleta {
-  @PrimaryGeneratedColumn('increment')
-  numero: number;
+@Entity('bicicletas')
+export class BicicletaEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   marca: string;
@@ -13,8 +13,11 @@ export class Bicicleta {
   modelo: string;
 
   @Column()
-  ano: number;
+  ano: string;
 
   @Column()
-  status: string = 'nova';
+  numero: number;
+
+  @Column({ type: 'varchar' }) // Defina "nova" como valor inicial
+  status: BicicletaStatus;
 }
