@@ -3,7 +3,7 @@ import { Inject, Injectable} from '@nestjs/common';
 import { CreateTrancaDto } from '../trancas/dto/create-Tranca.dto';
 import { UpdateTrancaDto } from '../trancas/dto/update-Tranca.dto';
 import { Tranca, TrancaStatus } from '../trancas/domain/tranca';
-import { generateRandomNumber } from 'src/utils/random-number';
+import { generateRandomNumber } from '../utils/random-number';
 import { TrancaRepository } from '../trancas/domain/tranca.repository';
 
 //  @InjectRepository é usado para injetar um repositório
@@ -28,7 +28,7 @@ export class TrancasService {
       throw new Error('Tranca não encontrada');
     }
 
-    if (trancaExistente.status !== TrancaStatus.OCUPADA) {
+    if (trancaExistente.status === TrancaStatus.OCUPADA) {
       throw new Error('Apenas Trancas sem bicicletas podem ser excluídas');
     }
     return this.trancaRepository.delete(idTranca);
