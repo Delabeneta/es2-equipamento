@@ -1,8 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TrancasService } from './trancas.service';
-import { CreateTrancaDto } from './dto/create-tranca.dto';
-import { UpdateTrancaDto } from './dto/update-tranca.dto';
+import { Controller, Delete, Get, Post, Put, Param, ParseIntPipe, Body } from '@nestjs/common';
+import { TrancasService } from '../trancas/trancas.service';
+import { CreateTrancaDto } from '../trancas/dto/create-Tranca.dto';
+import { UpdateTrancaDto } from '../trancas/dto/update-Tranca.dto';
+
 
 @Controller('Trancas')
 export class TrancasController {
@@ -13,23 +14,21 @@ export class TrancasController {
     return this.trancasService.create(createTrancaDto);
   }
 
+  @Put(':idTranca')
+  update(
+    @Param('idTranca', ParseIntPipe) idTranca: number,
+    @Body() updateTrancaDto: UpdateTrancaDto,
+  ) {
+    return this.trancasService.update(idTranca, updateTrancaDto);
+  }
+
   @Get()
   findAll() {
     return this.trancasService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.trancasService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTrancaDto: UpdateTrancaDto) {
-    return this.trancasService.update(+id, updateTrancaDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.trancasService.remove(+id);
+  @Delete(':idTranca')
+  async delete(@Param('idTranca') idTranca: number) {
+    return this.trancasService.delete(idTranca);
   }
 }

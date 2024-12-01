@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { Injectable } from '@nestjs/common';
-import { CreateTrancaDto } from './dto/create-Tranca.dto';
-import { UpdateTrancaDto } from './dto/update-Tranca.dto';
-import { Tranca } from './entities/tranca.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Inject, Injectable} from '@nestjs/common';
+import { CreateTrancaDto } from '../trancas/dto/create-Tranca.dto';
+import { UpdateTrancaDto } from '../trancas/dto/update-Tranca.dto';
+import { Tranca, TrancaStatus } from '../trancas/domain/tranca';
+import { generateRandomNumber } from 'src/utils/random-number';
+import { TrancaRepository } from '../trancas/domain/tranca.repository';
 
 //  @InjectRepository é usado para injetar um repositório
 // associado a uma entidade diretamente no serviço.
@@ -16,28 +16,52 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class TrancasService {
-  constructor( 
-      @InjectRepository(Tranca)
-      private trancaRepository: Repository<Tranca>,
+  constructor(
+    @Inject('TrancaRepository')
+    private readonly trancaRepository: TrancaRepository, //
   ) {}
 
+  async delete(idTranca: number) {
+    const trancaExistente =
+      await this.trancaRepository.findById(idTranca);
+    if (!trancaExistente) {
+      throw new Error('Tranca não encontrada');
+    }
+
+    if (trancaExistente.status !== TrancaStatus.OCUPADA) {
+      throw new Error('Apenas Trancas sem bicicletas podem ser excluídas');
+    }
+    return this.trancaRepository.delete(idTranca);
+  }
+
+  async findAll(): Promise<Tranca[]> {
+    const trancas = await this.trancaRepository.findAll();
+    
+    return trancas;
+  }
+
+  async update(idTranca: number, updateTrancaDto: UpdateTrancaDto) {
+    const trancaExistente =
+      await this.trancaRepository.findById(idTranca);
+    if (!trancaExistente) {
+      throw new Error('Tranca não encontrada');
+    }
+    return this.trancaRepository.update(idTranca, updateTrancaDto);
+  }
+
+  // criar uma tranca
   create(createTrancaDto: CreateTrancaDto) {
-    return this.trancaRepository.save(createTrancaDto);
-  } // 
+    const trancaNumero = generateRandomNumber();
+    const trancaStatus = TrancaStatus.NOVA;
 
-  findAll() {
-    return `This action returns all Tranca`;
+    return this.trancaRepository.create({
+      status: trancaStatus,
+      numero: trancaNumero,
+      modelo: createTrancaDto.modelo,
+      anoDeFabricacao: createTrancaDto.anoDeFabricacao,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} Tranca`;
-  }
 
-  update(id: number, updateTrancaDto: UpdateTrancaDto) {
-    return `This action updates a #${id} Tranca`;
-  }
 
-  remove(id: number) {
-    return `This action removes a #${id} Tranca`;
-  }
 }

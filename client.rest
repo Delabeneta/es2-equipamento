@@ -5,8 +5,10 @@
 
 # Bicicletas
 
-Get {{baseurl}}/bicicletas/
+Get {{baseurl}}/bicicletas
 ###
+
+
 PUT {{baseurl}}/bicicletas/3/
 Content-Type: application/json
 
@@ -22,7 +24,83 @@ POST {{baseurl}}/bicicletas/
 Content-Type: application/json
 
 {   
-    "ano": "2024",
-    "modelo": "bmx",
-    "marca": "azul"
+    "ano": "2222",
+    "modelo": "eeeeeee",
+    "marca": "ddddd"
 }
+
+
+
+###
+
+DELETE {{baseurl}}/bicicletas/1/
+Content-Type: application/json
+
+{   
+    "ano": "2025",
+    "modelo": "monarc",
+    "marca": "vermelho"
+} 
+
+
+
+
+### TRANCAS
+
+Get {{baseurl}}/trancas/
+###
+
+
+PUT {{baseurl}}/trancas/1/
+Content-Type: application/json
+
+{   
+    "anoDeFabricacao": "2000"
+}
+
+
+###
+POST {{baseurl}}/trancas/
+Content-Type: application/json
+
+{   
+    "anoDeFabricacao": "2222",
+    "modelo": "ccccc"
+}
+
+
+
+###
+
+DELETE {{baseurl}}/trancas/1/
+
+
+
+### TOTEM
+
+Get {{baseurl}}/totem/
+###
+
+
+PUT {{baseurl}}/totem/1/
+Content-Type: application/json
+
+{   
+    "anoDeFabricacao": "2000"
+}
+
+
+###
+POST {{baseurl}}/totem/
+Content-Type: application/json
+
+{   
+    "localizacao": "amage2",
+    "descricao": "aaaperto da Upa2"
+}
+
+
+
+###
+
+DELETE {{baseurl}}/totem/5/

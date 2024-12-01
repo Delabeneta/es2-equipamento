@@ -1,14 +1,19 @@
-import { Bicicleta } from './bicicleta';
+import { Bicicleta, BicicletaStatus } from './bicicleta';
 
-export type BicicletaPersistence = Bicicleta & { id: number };
+export type CreateBicicleta = {
+  ano: string;
+  marca: string;
+  modelo: string;
+  numero: number;
+  status: BicicletaStatus;
+};
+
+export type UpdateBicicleta = Partial<CreateBicicleta>;
 
 export interface BicicletaRepository {
-  findById(idBicicleta: number): Promise<BicicletaPersistence>;
+  findById(idBicicleta: number): Promise<Bicicleta>;
+  findAll(): Promise<Bicicleta[]>;
+  create(bicicleta: CreateBicicleta): Promise<Bicicleta>;
+  update(idBicicleta: number, data: UpdateBicicleta): Promise<Bicicleta>;
   delete(idBicicleta: number): Promise<void>;
-  findAll(): Promise<BicicletaPersistence[]>;
-  create(bicicleta: Bicicleta): Promise<BicicletaPersistence>;
-  update(
-    idBicicleta: number,
-    data: Partial<Bicicleta>,
-  ): Promise<BicicletaPersistence>;
 }

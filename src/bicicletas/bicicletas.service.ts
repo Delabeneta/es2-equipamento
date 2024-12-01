@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
 import { BicicletaRepository } from './domain/bicicleta.repository';
 import { generateRandomNumber } from 'src/utils/random-number';
@@ -7,27 +7,33 @@ import { UpdateBicicletaDto } from './dto/update-bicicleta.dto';
 
 @Injectable()
 export class BicicletasService {
+  constructor(
+    @Inject('BicicletaRepository')
+    private readonly bicicletaRepository: BicicletaRepository, //
+  ) {}
+
   async delete(idBicicleta: number) {
     const bicicletaExistente =
       await this.bicicletaRepository.findById(idBicicleta);
     if (!bicicletaExistente) {
-      throw new NotFoundException('Bicicleta nao encontrada');
+      throw new Error('Bicicleta nao encontrada');
+    }
+    //// VOLTAR AQUIII
+
+    if (bicicletaExistente.status !== BicicletaStatus.APOSENTADA) {
+      throw new Error('Apenas Bicicletas aposentadas podem ser excluidas');
     }
     return this.bicicletaRepository.delete(idBicicleta);
   }
   findAll() {
     return this.bicicletaRepository.findAll();
   }
-  constructor(
-    @Inject('BicicletaRepository')
-    private readonly bicicletaRepository: BicicletaRepository, //
-  ) {}
 
   async update(idBicicleta: number, updateBicicletaDto: UpdateBicicletaDto) {
     const bicicletaExistente =
       await this.bicicletaRepository.findById(idBicicleta);
     if (!bicicletaExistente) {
-      throw new NotFoundException('Bicicleta nao encontrada');
+      throw new Error('Bicicleta nao encontrada');
     }
     return this.bicicletaRepository.update(idBicicleta, updateBicicletaDto);
   }

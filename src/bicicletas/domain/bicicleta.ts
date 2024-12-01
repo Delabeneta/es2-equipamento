@@ -9,6 +9,7 @@ export enum BicicletaStatus {
 }
 
 export class Bicicleta {
+  id: number;
   marca: string;
   modelo: string;
   ano: string;

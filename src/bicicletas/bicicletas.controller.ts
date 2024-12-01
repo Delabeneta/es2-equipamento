@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   HttpCode,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { BicicletasService } from './bicicletas.service';
 import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
@@ -15,6 +16,7 @@ import { UpdateBicicletaDto } from './dto/update-bicicleta.dto';
 @Controller('bicicletas')
 export class BicicletasController {
   constructor(private readonly bicicletasService: BicicletasService) {}
+
   @Post()
   @HttpCode(201)
   create(@Body() createBicicletaDto: CreateBicicletaDto) {
@@ -23,7 +25,7 @@ export class BicicletasController {
 
   @Put(':idBicicleta')
   update(
-    @Param('idBicicleta') idBicicleta: number,
+    @Param('idBicicleta', ParseIntPipe) idBicicleta: number,
     @Body() updateBicicletaDto: UpdateBicicletaDto,
   ) {
     return this.bicicletasService.update(idBicicleta, updateBicicletaDto);
@@ -35,7 +37,7 @@ export class BicicletasController {
   }
 
   @Delete(':idBicicleta')
-  delete(@Param('idBicicleta') idBicicleta: number) {
+  async delete(@Param('idBicicleta') idBicicleta: number) {
     return this.bicicletasService.delete(idBicicleta);
   }
 }

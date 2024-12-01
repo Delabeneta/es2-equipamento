@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { BicicletaEntity } from 'src/bicicletas/entities/bicicleta.entity';
+import { config } from 'src/ormconfig';
 import { DataSource } from 'typeorm';
 
 @Global()
@@ -8,12 +8,7 @@ import { DataSource } from 'typeorm';
     {
       provide: DataSource,
       useFactory: async () => {
-        const dataSource = new DataSource({
-          type: 'sqlite',
-          database: __dirname + '/../../db.sqlite',
-          entities: [BicicletaEntity],
-          synchronize: true,
-        });
+        const dataSource = new DataSource(config);
         await dataSource.initialize();
         return dataSource;
       },

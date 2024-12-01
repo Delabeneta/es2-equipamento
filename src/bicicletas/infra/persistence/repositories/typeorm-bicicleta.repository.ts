@@ -1,14 +1,11 @@
 import { Bicicleta, BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
-import {
-  BicicletaPersistence,
-  BicicletaRepository,
-} from 'src/bicicletas/domain/bicicleta.repository';
-import { BicicletaEntity } from 'src/bicicletas/entities/bicicleta.entity';
+import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
+import { BicicletaEntity } from 'src/bicicletas/infra/persistence/entities/bicicleta.entity';
 import { Not, Repository } from 'typeorm';
 
 export class TypeormBicicletaRepository implements BicicletaRepository {
   constructor(private readonly repository: Repository<BicicletaEntity>) {}
-  findById(idBicicleta: number): Promise<BicicletaPersistence> {
+  findById(idBicicleta: number): Promise<Bicicleta> {
     return this.repository.findOneBy({
       id: idBicicleta,
     });
@@ -19,7 +16,7 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
     });
   }
 
-  async findAll(): Promise<BicicletaPersistence[]> {
+  async findAll(): Promise<Bicicleta[]> {
     return this.repository.find({
       where: {
         status: Not(BicicletaStatus.EXCLUIDA),
@@ -30,14 +27,15 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
   async update(
     idBicicleta: number,
     data: Partial<Bicicleta>,
-  ): Promise<BicicletaPersistence> {
+  ): Promise<Bicicleta> {
     await this.repository.update(idBicicleta, data);
     return this.repository.findOneBy({
       id: idBicicleta,
     });
   }
 
-  async create(bicicleta: Bicicleta): Promise<BicicletaPersistence> {
-    return this.repository.save(bicicleta);
+  async create(bicicleta: Bicicleta): Promise<Bicicleta> {
+    const entity = this.repository.create(bicicleta);
+    return this.repository.save(entity);
   }
 }
