@@ -9,8 +9,8 @@ import {
   Body,
 } from '@nestjs/common';
 import { TrancasService } from '../trancas/trancas.service';
-import { CreateTrancaDto } from '../trancas/dto/create-Tranca.dto';
-import { UpdateTrancaDto } from '../trancas/dto/update-Tranca.dto';
+import { CreateTrancaDto } from '../trancas/dto/create-tranca.dto';
+import { UpdateTrancaDto } from '../trancas/dto/update-tranca.dto';
 
 @Controller('Trancas')
 export class TrancasController {

@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { Inject, Injectable} from '@nestjs/common';
-import { CreateTrancaDto } from '../trancas/dto/create-Tranca.dto';
-import { UpdateTrancaDto } from '../trancas/dto/update-Tranca.dto';
+import { CreateTrancaDto } from '../trancas/dto/create-tranca.dto';
+import { UpdateTrancaDto } from '../trancas/dto/update-tranca.dto';
 import { Tranca, TrancaStatus } from '../trancas/domain/tranca';
 import { generateRandomNumber } from '../utils/random-number';
 import { TrancaRepository } from '../trancas/domain/tranca.repository';

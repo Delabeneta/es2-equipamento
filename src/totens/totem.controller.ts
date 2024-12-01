@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Post, Param, Body } from '@nestjs/common';
-import { CreateTotemDto } from './dto/create-Totem.dto';
 import { TotemService } from './totem.service';
+import { CreateTotemDto } from './dto/create-totem.dto';
 
 @Controller('totem')
 export class TotemController {
