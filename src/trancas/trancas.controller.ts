@@ -1,9 +1,16 @@
-/* eslint-disable prettier/prettier */
-import { Controller, Delete, Get, Post, Put, Param, ParseIntPipe, Body } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Param,
+  ParseIntPipe,
+  Body,
+} from '@nestjs/common';
 import { TrancasService } from '../trancas/trancas.service';
 import { CreateTrancaDto } from '../trancas/dto/create-Tranca.dto';
 import { UpdateTrancaDto } from '../trancas/dto/update-Tranca.dto';
-
 
 @Controller('Trancas')
 export class TrancasController {

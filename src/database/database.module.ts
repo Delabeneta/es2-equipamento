@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { config } from 'src/ormconfig';
+import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 
 @Global()
@@ -7,8 +7,18 @@ import { DataSource } from 'typeorm';
   providers: [
     {
       provide: DataSource,
-      useFactory: async () => {
-        const dataSource = new DataSource(config);
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        const dataSource = new DataSource({
+          type: 'postgres',
+          host: config.get('DATABASE_HOST'),
+          port: parseInt(config.get('DATABASE_PORT')),
+          username: config.get('DATABASE_USER'),
+          password: config.get('DATABASE_PASSWORD'),
+          database: config.get('DATABASE_NAME'),
+          synchronize: true,
+          entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+        });
         await dataSource.initialize();
         return dataSource;
       },

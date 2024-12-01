@@ -3,13 +3,6 @@ import { TotemRepository } from './domain/totem.repository';
 import { Totem } from './domain/totem';
 import { CreateTotemDto } from './dto/create-totem.dto';
 
-//  @InjectRepository é usado para injetar um repositório
-// associado a uma entidade diretamente no serviço.
-
-// Posso usar métodos sem precisar instanciar o repósito manualmente
-// Um repositorio atua como uma camada de abstração,
-// entre o codigo e o BD  faacilitando realiar o CRUD
-
 @Injectable()
 export class TotemService {
   constructor(

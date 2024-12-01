@@ -2,7 +2,7 @@ import { Totem } from 'src/totens/domain/totem';
 import { TrancaEntity } from 'src/trancas/infra/persistence/entities/tranca.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('totens')
 export class TotemEntity {
   @PrimaryGeneratedColumn()
   id: number;
