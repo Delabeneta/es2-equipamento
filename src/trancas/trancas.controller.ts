@@ -41,7 +41,7 @@ export class TrancasController {
   }
 
   @Post('incluir-no-totem')
-  async incluirNoTotem(@Body() incluirTrancaDto: IncluirTrancaDto) {
+  async inserirNoTotem(@Body() incluirTrancaDto: IncluirTrancaDto) {
     return this.trancasService.incluirNoTotem(incluirTrancaDto);
   }
 }

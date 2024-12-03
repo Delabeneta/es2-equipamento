@@ -72,12 +72,16 @@ export class TrancasService {
      const { trancaId, totemId, funcionarioId } = incluirTrancaDto;
      const tranca = await this.trancaRepository.findById(trancaId); 
      
-     if (!tranca) { throw new Error('Tranca não encontrada'); }
-     if (tranca.status !== TrancaStatus.NOVA && tranca.status !== TrancaStatus.EM_REPARO) { throw new Error('Tranca está com status inválido para inserir no totem'); } 
-     if (tranca.status === TrancaStatus.EM_REPARO && tranca.funcionarioId !== funcionarioId) { throw new Error('Ação não permitida'); }
+     if (!tranca) {
+       throw new Error('Tranca não encontrada'); }
+     if (tranca.status !== TrancaStatus.NOVA && tranca.status !== TrancaStatus.EM_REPARO) {
+       throw new Error('Tranca está com status inválido para inserir no totem'); } 
+     if (tranca.status === TrancaStatus.EM_REPARO && tranca.funcionarioId !== funcionarioId) {
+       throw new Error('Ação não permitida'); }
      
      const totem = await this.totemRepository.findById(totemId);
-    if (!totem) { throw new Error('Totem não encontrado'); } 
+    if (!totem) {
+       throw new Error('Totem não encontrado'); } 
     
     await this.trancaRepository.update(trancaId, { 
       status: TrancaStatus.LIVRE, totem: { id: totemId }, }); 

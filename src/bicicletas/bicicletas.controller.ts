@@ -42,6 +42,14 @@ export class BicicletasController {
     return this.bicicletasService.delete(idBicicleta);
   }
 
+  @Post(':idBicicleta/status/:acao')
+  async trocarStatus(
+    @Param('idBicicleta', ParseIntPipe) idBicicleta: number,
+    @Param('acao') acao: string,
+  ) {
+    return this.bicicletasService.changeStatus(idBicicleta, acao);
+  }
+
   @Post('integrarNaRede')
   async integrarNaRede(
     @Body() includeBicicletaOnTrancaDto: IncludeBicicletaOnTrancaDto,
@@ -50,4 +58,13 @@ export class BicicletasController {
       includeBicicletaOnTrancaDto,
     );
   }
+
+  /*@Post('retirarDaRede')
+  async retirarDaRede(
+    @Body() includeBicicletaOnTrancaDto: IncludeBicicletaOnTrancaDto,
+  ) {
+    return this.bicicletasService.retirarBicicletaDaRede(
+      includeBicicletaOnTrancaDto,
+    );
+  } */
 }

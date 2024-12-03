@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TrancaRepository } from './domain/tranca.repository';
 import { TrancasService } from './trancas.service';
 import { TrancaStatus } from './domain/tranca';
+import { TotemEntity } from 'src/totens/domain/totem.entity';
 
 describe('TrancaService', () => {
   const mockDto = {
@@ -12,6 +13,10 @@ describe('TrancaService', () => {
     anoDeFabricacao: '2024',
     localizacao: 'mage',
     status: TrancaStatus.NOVA,
+    totem: null as TotemEntity | null, // Adicionar totem e outros campos necessários
+    totemId: null as number | null,
+    bicicletaId: null as number | null,
+    funcionarioId: null as number | null,
   };
 
   let service: TrancasService;

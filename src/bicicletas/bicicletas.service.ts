@@ -107,4 +107,32 @@ export class BicicletasService {
 
     return { message: 'bicicleta inserida!' };
   }
+
+  async changeStatus(idBicicleta: number, acao: string) {
+    const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
+    if (!bicicleta) {
+      throw new Error('Bicicleta não encontrada');
+    }
+    switch (acao.toLowerCase()) {
+      case 'aposentar':
+        bicicleta.status = BicicletaStatus.APOSENTADA;
+        break;
+      case 'em_uso':
+        bicicleta.status = BicicletaStatus.EM_USO;
+        break;
+      case 'em_reparo':
+        bicicleta.status = BicicletaStatus.EM_REPARO;
+        break;
+      case 'disponivel':
+        bicicleta.status = BicicletaStatus.DISPONIVEL;
+        break;
+      default:
+        throw new Error('Ação de status inválida');
+    }
+    const updatedBicicleta = await this.bicicletaRepository.update(
+      idBicicleta,
+      bicicleta,
+    );
+    return updatedBicicleta;
+  }
 }
