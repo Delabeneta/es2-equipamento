@@ -1,28 +1,30 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TrancaRepository } from './domain/tranca.repository';
 import { TrancasService } from './trancas.service';
-import { TrancaStatus } from './domain/tranca';
-import { TotemEntity } from 'src/totens/domain/totem.entity';
+import { Tranca, TrancaStatus } from './domain/tranca';
+import { TrancaEntity } from './domain/tranca.entity';
 
 describe('TrancaService', () => {
-  const mockDto = {
-    id: 1,
-    bicicleta: 0,
-    numero: 1423,
-    modelo: 'Pau-Grande',
-    anoDeFabricacao: '2024',
-    localizacao: 'mage',
-    status: TrancaStatus.NOVA,
-    totem: null as TotemEntity | null, // Adicionar totem e outros campos necessários
-    totemId: null as number | null,
-    bicicletaId: null as number | null,
-    funcionarioId: null as number | null,
-  };
+  let mockEntity: TrancaEntity;
+  let mockDomain: Tranca;
 
   let service: TrancasService;
   let repository: TrancaRepository;
 
   beforeEach(async () => {
+    mockEntity = {
+      id: 1,
+      numero: 12,
+      status: TrancaStatus.NOVA,
+      modelo: 'teste',
+      anoDeFabricacao: '2012',
+      bicicleta: null,
+      totem: null,
+      totemId: 0,
+      bicicletaId: 0,
+      funcionarioId: 0,
+    };
+    mockDomain = TrancaEntity.toDomain(mockEntity);
     repository = {
       create: jest.fn(),
       update: jest.fn(),
@@ -30,6 +32,7 @@ describe('TrancaService', () => {
       findAll: jest.fn(),
       findById: jest.fn(),
     };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TrancasService,
@@ -45,57 +48,59 @@ describe('TrancaService', () => {
   });
 
   it('should create a new tranca', async () => {
-    jest.spyOn(repository, 'create').mockResolvedValue(mockDto);
+    jest.spyOn(repository, 'create').mockResolvedValue(mockEntity);
     await expect(
       service.create({
-        anoDeFabricacao: mockDto.anoDeFabricacao,
-        modelo: mockDto.modelo,
+        anoDeFabricacao: mockEntity.anoDeFabricacao,
+        modelo: mockEntity.modelo,
       }),
-    ).resolves.toBe(mockDto);
+    ).resolves.toStrictEqual(mockDomain);
   });
 
   it('should delete the tranca', async () => {
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockDto);
-    await expect(service.delete(mockDto.id)).resolves.toBeUndefined();
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockEntity);
+    await expect(service.delete(mockEntity.id)).resolves.toBeUndefined();
     expect(repository.findById).toHaveBeenCalled();
   });
 
   it('should not delete when tranca not found', async () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(null);
-    await expect(service.delete(mockDto.id)).rejects.toThrow(
+    await expect(service.delete(mockEntity.id)).rejects.toThrow(
       'Tranca não encontrada',
     );
     expect(repository.findById).toHaveBeenCalled();
   });
 
   it('should not delete when tranca occupied', async () => {
-    mockDto.status = TrancaStatus.OCUPADA;
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockDto);
-    await expect(service.delete(mockDto.id)).rejects.toThrow(
+    mockEntity.status = TrancaStatus.OCUPADA;
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockEntity);
+    await expect(service.delete(mockEntity.id)).rejects.toThrow(
       'Apenas Trancas sem bicicletas podem ser excluídas',
     );
     expect(repository.findById).toHaveBeenCalled();
   });
 
   it('should return all trancas', async () => {
-    jest.spyOn(repository, 'findAll').mockResolvedValue([mockDto]);
-    await expect(service.findAll()).resolves.toStrictEqual([mockDto]);
+    jest.spyOn(repository, 'findAll').mockResolvedValue([mockEntity]);
+    await expect(service.findAll()).resolves.toStrictEqual([mockDomain]);
     expect(repository.findAll).toHaveBeenCalled();
   });
 
   it('should update trancas', async () => {
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockDto);
-    mockDto.modelo = 'test';
-    jest.spyOn(repository, 'update').mockResolvedValue(mockDto);
-    await expect(service.update(mockDto.id, mockDto)).resolves.toStrictEqual(
-      mockDto,
-    );
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockEntity);
+    mockEntity.modelo = 'bauduco';
+    mockDomain.modelo = 'bauduco';
+    jest.spyOn(repository, 'update').mockResolvedValue(mockEntity);
+    await expect(
+      service.update(mockEntity.id, mockEntity),
+    ).resolves.toStrictEqual(mockDomain);
     expect(repository.findById).toHaveBeenCalled();
+    expect(repository.update).toHaveBeenCalled();
   });
 
   it('should not update when tranca not found', async () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(null);
-    await expect(service.update(mockDto.id, mockDto)).rejects.toThrow(
+    await expect(service.update(mockEntity.id, mockEntity)).rejects.toThrow(
       'Tranca não encontrada',
     );
     expect(repository.findById).toHaveBeenCalled();

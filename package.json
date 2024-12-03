@@ -64,8 +64,9 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
+    "modulePaths": ["<rootDir>"],
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },

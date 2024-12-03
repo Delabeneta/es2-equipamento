@@ -8,13 +8,6 @@ import { TrancaRepository } from '../trancas/domain/tranca.repository';
 import { TrancaEntity } from './domain/tranca.entity';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 
-//  @InjectRepository é usado para injetar um repositório
-// associado a uma entidade diretamente no serviço.
-
-// Posso usar métodos sem precisar instanciar o repósito manualmente
-// Um repositorio atua como uma camada de abstração, 
-// entre o codigo e o BD  faacilitando realiar o CRUD
-
 
 @Injectable()
 export class TrancasService {

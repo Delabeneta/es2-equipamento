@@ -33,7 +33,7 @@ export class TypeormTrancaEntity {
   totemId: number;
   @Column({ nullable: true })
   @RelationId((tranca: TypeormTrancaEntity) => tranca.bicicleta)
-  bicicletaid: number;
+  bicicletaId: number;
   @Column({ nullable: true })
   funcionarioId: number;
 }

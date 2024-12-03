@@ -1,18 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TotemRepository } from './domain/totem.repository';
 import { TotemService } from './totem.service';
+import { Totem } from './domain/totem';
+import { TotemEntity } from './domain/totem.entity';
 
 describe('TotemService', () => {
-  const mockDto = {
-    id: 1,
-    localizacao: 'Pau-Grande',
-    descricao: "Garricha'house",
-  };
+  let mockEntity: TotemEntity;
+  let mockDomain: Totem;
 
   let service: TotemService;
   let repository: TotemRepository;
 
   beforeEach(async () => {
+    mockEntity = {
+      id: 1,
+      localizacao: 'Fragoso',
+      descricao: 'Posto 24h',
+      trancas: [],
+    };
+
+    mockDomain = TotemEntity.toDomain(mockEntity);
+
     repository = {
       create: jest.fn(),
       delete: jest.fn(),
@@ -34,32 +42,32 @@ describe('TotemService', () => {
   });
 
   it('should create a new totem', async () => {
-    jest.spyOn(repository, 'create').mockResolvedValue(mockDto);
+    jest.spyOn(repository, 'create').mockResolvedValue(mockEntity);
     await expect(
       service.create({
-        localizacao: mockDto.localizacao,
-        descricao: mockDto.descricao,
+        localizacao: mockEntity.localizacao,
+        descricao: mockEntity.descricao,
       }),
-    ).resolves.toBe(mockDto);
+    ).resolves.toStrictEqual(mockDomain);
   });
 
   it('should delete the totem', async () => {
-    jest.spyOn(repository, 'findById').mockResolvedValue(mockDto);
-    await expect(service.delete(mockDto.id)).resolves.toBeUndefined();
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockEntity);
+    await expect(service.delete(mockEntity.id)).resolves.toBeUndefined();
     expect(repository.findById).toHaveBeenCalled();
   });
 
   it('should not delete when totem not found', async () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(null);
-    await expect(service.delete(mockDto.id)).rejects.toThrow(
+    await expect(service.delete(mockEntity.id)).rejects.toThrow(
       'Totem não encontrada',
     );
     expect(repository.findById).toHaveBeenCalled();
   });
 
   it('should return all totens', async () => {
-    jest.spyOn(repository, 'findAll').mockResolvedValue([mockDto]);
-    await expect(service.findAll()).resolves.toStrictEqual([mockDto]);
+    jest.spyOn(repository, 'findAll').mockResolvedValue([mockEntity]);
+    await expect(service.findAll()).resolves.toStrictEqual([mockDomain]);
     expect(repository.findAll).toHaveBeenCalled();
   });
 });

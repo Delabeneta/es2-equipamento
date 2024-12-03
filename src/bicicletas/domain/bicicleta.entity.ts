@@ -12,6 +12,7 @@ export class BicicletaEntity {
   funcionarioId: number;
   trancaId: number;
   static toDomain(entity: BicicletaEntity) {
+    if (!entity) return null;
     const bicicleta = new Bicicleta();
     bicicleta.ano = entity.ano;
     bicicleta.id = entity.id;

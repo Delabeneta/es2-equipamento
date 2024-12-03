@@ -11,10 +11,11 @@ export class TrancaEntity {
   bicicleta: BicicletaEntity | null;
   totem: TotemEntity | null;
   totemId: number;
-  bicicletaid: number;
+  bicicletaId: number;
   funcionarioId: number;
 
   static toDomain(trancaEntity: TrancaEntity) {
+    if (!trancaEntity) return null;
     const tranca = new Tranca();
     tranca.localizacao = '';
     tranca.bicicleta = 0;

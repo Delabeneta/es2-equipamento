@@ -1,6 +1,10 @@
-import { Bicicleta, BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
+import { BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
 import { BicicletaEntity } from 'src/bicicletas/domain/bicicleta.entity';
-import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
+import {
+  BicicletaRepository,
+  CreateBicicleta,
+  UpdateBicicleta,
+} from 'src/bicicletas/domain/bicicleta.repository';
 import { Not, Repository } from 'typeorm';
 import { TypeormBicicletaEntity } from '../entities/typeorm-bicicleta.entity';
 
@@ -20,18 +24,17 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
   }
 
   async findAll(): Promise<BicicletaEntity[]> {
-    const teste = await this.repository.find({
+    const bicicletas = await this.repository.find({
       where: {
         status: Not(BicicletaStatus.EXCLUIDA),
       },
     });
-    console.log(teste);
-    return teste;
+    return bicicletas;
   }
 
   async update(
     idBicicleta: number,
-    data: Partial<Bicicleta>,
+    data: UpdateBicicleta,
   ): Promise<BicicletaEntity> {
     await this.repository.update(idBicicleta, data);
     return this.repository.findOneBy({
@@ -39,7 +42,7 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
     });
   }
 
-  async create(bicicleta: Bicicleta): Promise<BicicletaEntity> {
+  async create(bicicleta: CreateBicicleta): Promise<BicicletaEntity> {
     const entity = this.repository.create(bicicleta);
     return this.repository.save(entity);
   }
