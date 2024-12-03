@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { TotemRepository } from './domain/totem.repository';
 import { Totem } from './domain/totem';
 import { CreateTotemDto } from './dto/create-totem.dto';
+import { TotemEntity } from './domain/totem.entity';
 
 @Injectable()
 export class TotemService {
@@ -19,14 +20,15 @@ export class TotemService {
   }
 
   async findAll(): Promise<Totem[]> {
-    const totems = await this.totemRepository.findAll();
-    return totems;
+    const totens = await this.totemRepository.findAll();
+    return totens.map((totem) => TotemEntity.toDomain(totem));
   }
 
-  create(createTotemDto: CreateTotemDto) {
-    return this.totemRepository.create({
+  async create(createTotemDto: CreateTotemDto) {
+    const createdTotem = await this.totemRepository.create({
       descricao: createTotemDto.descricao,
       localizacao: createTotemDto.localizacao,
     });
+    return TotemEntity.toDomain(createdTotem);
   }
 }

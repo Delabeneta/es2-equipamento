@@ -1,4 +1,5 @@
-import { Tranca, TrancaStatus } from './tranca';
+import { TrancaStatus } from './tranca';
+import { TrancaEntity } from './tranca.entity';
 
 export type CreateTranca = {
   anoDeFabricacao: string;
@@ -17,9 +18,9 @@ export type UpdateTranca = Partial<CreateTranca> & {
 };
 
 export interface TrancaRepository {
-  findById(idTranca: number): Promise<Tranca>;
-  findAll(): Promise<Tranca[]>;
-  create(tranca: CreateTranca): Promise<Tranca>;
-  update(idTranca: number, data: UpdateTranca): Promise<Tranca>;
+  findById(idTranca: number): Promise<TrancaEntity>;
+  findAll(): Promise<TrancaEntity[]>;
+  create(tranca: CreateTranca): Promise<TrancaEntity>;
+  update(idTranca: number, data: UpdateTranca): Promise<TrancaEntity>;
   delete(idTranca: number): Promise<void>;
 }

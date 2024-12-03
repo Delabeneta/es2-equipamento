@@ -5,6 +5,7 @@ import { UpdateTrancaDto } from '../trancas/dto/update-tranca.dto';
 import { Tranca, TrancaStatus } from '../trancas/domain/tranca';
 import { generateRandomNumber } from '../utils/random-number';
 import { TrancaRepository } from '../trancas/domain/tranca.repository';
+import { TrancaEntity } from './domain/tranca.entity';
 
 //  @InjectRepository é usado para injetar um repositório
 // associado a uma entidade diretamente no serviço.
@@ -36,8 +37,7 @@ export class TrancasService {
 
   async findAll(): Promise<Tranca[]> {
     const trancas = await this.trancaRepository.findAll();
-    
-    return trancas;
+    return trancas.map(tranca => TrancaEntity.toDomain(tranca)); ;
   }
 
   async update(idTranca: number, updateTrancaDto: UpdateTrancaDto) {
@@ -46,20 +46,23 @@ export class TrancasService {
     if (!trancaExistente) {
       throw new Error('Tranca não encontrada');
     }
-    return this.trancaRepository.update(idTranca, updateTrancaDto);
+    const updatedTranca = await this.trancaRepository.update(idTranca, updateTrancaDto);
+    return TrancaEntity.toDomain(updatedTranca);
   }
 
+
   // criar uma tranca
-  create(createTrancaDto: CreateTrancaDto) {
+   async create(createTrancaDto: CreateTrancaDto) {
     const trancaNumero = generateRandomNumber();
     const trancaStatus = TrancaStatus.NOVA;
-
-    return this.trancaRepository.create({
+    const createdTranca = await this.trancaRepository.create({
       status: trancaStatus,
       numero: trancaNumero,
       modelo: createTrancaDto.modelo,
       anoDeFabricacao: createTrancaDto.anoDeFabricacao,
     });
+    return TrancaEntity.toDomain(createdTranca);
+
   }
 
 

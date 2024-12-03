@@ -1,4 +1,5 @@
-import { Bicicleta, BicicletaStatus } from './bicicleta';
+import { BicicletaStatus } from './bicicleta';
+import { BicicletaEntity } from './bicicleta.entity';
 
 export type CreateBicicleta = {
   ano: string;
@@ -11,9 +12,9 @@ export type CreateBicicleta = {
 export type UpdateBicicleta = Partial<CreateBicicleta>;
 
 export interface BicicletaRepository {
-  findById(idBicicleta: number): Promise<Bicicleta>;
-  findAll(): Promise<Bicicleta[]>;
-  create(bicicleta: CreateBicicleta): Promise<Bicicleta>;
-  update(idBicicleta: number, data: UpdateBicicleta): Promise<Bicicleta>;
+  findById(idBicicleta: number): Promise<BicicletaEntity>;
+  findAll(): Promise<BicicletaEntity[]>;
+  create(bicicleta: CreateBicicleta): Promise<BicicletaEntity>;
+  update(idBicicleta: number, data: UpdateBicicleta): Promise<BicicletaEntity>;
   delete(idBicicleta: number): Promise<void>;
 }

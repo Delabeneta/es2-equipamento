@@ -33,7 +33,7 @@ export class BicicletasController {
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.bicicletasService.findAll();
   }
 
@@ -42,7 +42,7 @@ export class BicicletasController {
     return this.bicicletasService.delete(idBicicleta);
   }
 
-  @Post('/integrarNaRede')
+  @Post('integrarNaRede')
   async integrarNaRede(
     @Body() includeBicicletaOnTrancaDto: IncludeBicicletaOnTrancaDto,
   ) {

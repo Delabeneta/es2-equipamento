@@ -3,7 +3,7 @@ import { TotemService } from './totem.service';
 import { DataSource } from 'typeorm';
 import { TotemController } from './totem.controller';
 import { TypeormTotemRepository } from './infra/persistence/repositories/typeorm-totem.repository';
-import { TotemEntity } from './infra/persistence/entities/totem.entity';
+import { TypeormTotemEntity } from './infra/persistence/entities/typeorm-totem.entity';
 
 @Module({
   controllers: [TotemController],
@@ -14,7 +14,7 @@ import { TotemEntity } from './infra/persistence/entities/totem.entity';
       inject: [DataSource],
       useFactory: (dataSource: DataSource) => {
         return new TypeormTotemRepository(
-          dataSource.getRepository(TotemEntity),
+          dataSource.getRepository(TypeormTotemEntity),
         );
       },
     },

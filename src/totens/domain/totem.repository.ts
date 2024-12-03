@@ -1,4 +1,4 @@
-import { Totem } from './totem';
+import { TotemEntity } from './totem.entity';
 
 export type CreateTotem = {
   localizacao: string;
@@ -6,8 +6,8 @@ export type CreateTotem = {
 };
 
 export interface TotemRepository {
-  findById(idTotem: number): Promise<Totem>;
-  findAll(): Promise<Totem[]>;
-  create(totem: CreateTotem): Promise<Totem>;
+  findById(idTotem: number): Promise<TotemEntity>;
+  findAll(): Promise<TotemEntity[]>;
+  create(totem: CreateTotem): Promise<TotemEntity>;
   delete(idTotem: number): Promise<void>;
 }

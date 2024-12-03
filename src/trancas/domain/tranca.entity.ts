@@ -1,42 +1,17 @@
-import { BicicletaEntity } from 'src/bicicletas/infra/persistence/entities/bicicleta.entity';
-import { TotemEntity } from 'src/totens/infra/persistence/entities/totem.entity';
+import { BicicletaEntity } from 'src/bicicletas/domain/bicicleta.entity';
+import { TotemEntity } from 'src/totens/domain/totem.entity';
 import { Tranca, TrancaStatus } from 'src/trancas/domain/tranca';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-  RelationId,
-} from 'typeorm';
 
-@Entity('trancas')
 export class TrancaEntity {
-  @PrimaryGeneratedColumn()
   id: number;
-  @Column()
   numero: number;
-  @Column({ type: 'varchar' })
   status: TrancaStatus;
-  @Column()
   modelo: string;
-  @Column()
   anoDeFabricacao: string;
-  @OneToOne(() => BicicletaEntity, (bicicleta) => bicicleta.tranca)
-  @JoinColumn()
   bicicleta: BicicletaEntity | null;
-
-  @ManyToOne(() => TotemEntity, (totem) => totem.trancas)
   totem: TotemEntity | null;
-
-  @Column()
-  @RelationId((tranca: TrancaEntity) => tranca.totem)
   totemId: number;
-
-  @Column()
-  @RelationId((tranca: TrancaEntity) => tranca.bicicleta)
-  bicicletaId: number;
+  bicicletaid: number;
 
   static toDomain(trancaEntity: TrancaEntity) {
     const tranca = new Tranca();

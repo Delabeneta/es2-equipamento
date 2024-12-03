@@ -7,6 +7,7 @@ import { UpdateBicicletaDto } from './dto/update-bicicleta.dto';
 import { TrancaRepository } from 'src/trancas/domain/tranca.repository';
 import { TrancaStatus } from 'src/trancas/domain/tranca';
 import { IncludeBicicletaOnTrancaDto } from './dto/include-bicicleta-on-tranca.dto';
+import { BicicletaEntity } from './domain/bicicleta.entity';
 
 @Injectable()
 export class BicicletasService {
@@ -29,8 +30,9 @@ export class BicicletasService {
     }
     return this.bicicletaRepository.delete(idBicicleta);
   }
-  findAll() {
-    return this.bicicletaRepository.findAll();
+  async findAll() {
+    const ciclistas = await this.bicicletaRepository.findAll();
+    return ciclistas.map((ciclista) => BicicletaEntity.toDomain(ciclista));
   }
 
   async update(idBicicleta: number, updateBicicletaDto: UpdateBicicletaDto) {
@@ -38,27 +40,32 @@ export class BicicletasService {
     if (!bicicleta) {
       throw new Error('Bicicleta nao encontrada');
     }
-    return this.bicicletaRepository.update(idBicicleta, updateBicicletaDto);
+    const updatedCiclista = await this.bicicletaRepository.update(
+      idBicicleta,
+      updateBicicletaDto,
+    );
+    return BicicletaEntity.toDomain(updatedCiclista);
   }
 
   // criar uma bicicleta
-  create(createBicicletaDto: CreateBicicletaDto) {
+  async create(createBicicletaDto: CreateBicicletaDto) {
     const bicicletaNumero = generateRandomNumber();
     const bicicletaStatus = BicicletaStatus.NOVA;
 
-    return this.bicicletaRepository.create({
+    const createdBicicleta = await this.bicicletaRepository.create({
       ano: createBicicletaDto.ano,
       marca: createBicicletaDto.marca,
       status: bicicletaStatus,
       modelo: createBicicletaDto.modelo,
       numero: bicicletaNumero,
     });
+    return BicicletaEntity.toDomain(createdBicicleta);
   }
 
   async incluirBicicletaNaRede({
     idBicicleta,
-    idFuncionario,
     idTranca,
+    idFuncionario,
   }: IncludeBicicletaOnTrancaDto) {
     const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
 
@@ -75,11 +82,12 @@ export class BicicletasService {
       );
     }
 
-    if (bicicleta.status === BicicletaStatus.EM_REPARO) {
+    if (
+      bicicleta.status === BicicletaStatus.EM_REPARO &&
+      bicicleta.funcionarioId !== idFuncionario
+    ) {
+      throw new Error('Ação nao permitida');
     }
-
-    // validar status. Se estiver EM_Reparo, precisa verificar o reparador que
-    // retirou, é o mesmo que está devolvendo
 
     // 4. Solicitar o fechamento da tranca.
     const tranca = await this.trancaRepository.findById(idTranca);

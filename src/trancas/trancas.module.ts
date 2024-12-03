@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TrancasService } from './trancas.service';
 import { TrancasController } from './trancas.controller';
-import { TrancaEntity } from '../trancas/infra/persistence/entities/tranca.entity';
 import { TypeormTrancaRepository } from '../trancas/infra/persistence/repositories/typeorm-tranca.repository';
 import { DataSource } from 'typeorm';
+import { TypeormTrancaEntity } from './infra/persistence/entities/typeorm-tranca.entity';
 
 @Module({
   controllers: [TrancasController],
@@ -14,7 +14,7 @@ import { DataSource } from 'typeorm';
       inject: [DataSource],
       useFactory: (dataSource: DataSource) => {
         return new TypeormTrancaRepository(
-          dataSource.getRepository(TrancaEntity),
+          dataSource.getRepository(TypeormTrancaEntity),
         );
       },
     },

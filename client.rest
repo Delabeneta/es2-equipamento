@@ -5,11 +5,11 @@
 
 # Bicicletas
 
-Get {{baseurl}}/bicicletas
+Get {{baseurl}}/bicicleta
 ###
 
 
-PUT {{baseurl}}/bicicletas/3/
+PUT {{baseurl}}/bicicleta/3/
 Content-Type: application/json
 
 {   
@@ -20,13 +20,13 @@ Content-Type: application/json
 
 
 ###
-POST {{baseurl}}/bicicletas/
+POST {{baseurl}}/bicicleta/
 Content-Type: application/json
 
 {   
-    "ano": "2222",
-    "modelo": "eeeeeee",
-    "marca": "ddddd"
+    "ano": "22222",
+    "modelo": "eeee",
+    "marca": "ccc"
 }
 
 
@@ -42,7 +42,14 @@ Content-Type: application/json
     "marca": "vermelho"
 } 
 
-
+###
+POST http://localhost:3000/bicicleta/integrarNaRede/
+Content-Type: application/json
+{
+   "idBicicleta": "3",
+    "idTranca": "1",
+    "idFuncionario": "2"
+}
 
 
 ### TRANCAS
