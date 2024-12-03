@@ -16,3 +16,7 @@ export class Bicicleta {
   numero: number;
   status: BicicletaStatus;
 }
+
+export class BicicletaPersistence extends Bicicleta {
+  trancaId: number;
+}

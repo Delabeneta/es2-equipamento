@@ -16,3 +16,7 @@ export class Tranca {
   modelo: string;
   anoDeFabricacao: string;
 }
+
+export class TrancaPersistence extends Tranca {
+  bicicletaId: number;
+}

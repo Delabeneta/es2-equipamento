@@ -7,7 +7,14 @@ export type CreateTranca = {
   status: TrancaStatus;
 };
 
-export type UpdateTranca = Partial<CreateTranca>;
+export type UpdateTranca = Partial<CreateTranca> & {
+  bicicleta?: {
+    id: number;
+  };
+  totem?: {
+    id: number;
+  };
+};
 
 export interface TrancaRepository {
   findById(idTranca: number): Promise<Tranca>;

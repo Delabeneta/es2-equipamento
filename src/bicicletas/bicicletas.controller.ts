@@ -12,8 +12,9 @@ import {
 import { BicicletasService } from './bicicletas.service';
 import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
 import { UpdateBicicletaDto } from './dto/update-bicicleta.dto';
+import { IncludeBicicletaOnTrancaDto } from './dto/include-bicicleta-on-tranca.dto';
 
-@Controller('bicicletas')
+@Controller('bicicleta')
 export class BicicletasController {
   constructor(private readonly bicicletasService: BicicletasService) {}
 
@@ -39,5 +40,14 @@ export class BicicletasController {
   @Delete(':idBicicleta')
   async delete(@Param('idBicicleta') idBicicleta: number) {
     return this.bicicletasService.delete(idBicicleta);
+  }
+
+  @Post('/integrarNaRede')
+  async integrarNaRede(
+    @Body() includeBicicletaOnTrancaDto: IncludeBicicletaOnTrancaDto,
+  ) {
+    return this.bicicletasService.incluirBicicletaNaRede(
+      includeBicicletaOnTrancaDto,
+    );
   }
 }

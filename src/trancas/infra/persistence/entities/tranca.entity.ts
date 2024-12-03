@@ -8,6 +8,7 @@ import {
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
+  RelationId,
 } from 'typeorm';
 
 @Entity('trancas')
@@ -28,6 +29,14 @@ export class TrancaEntity {
 
   @ManyToOne(() => TotemEntity, (totem) => totem.trancas)
   totem: TotemEntity | null;
+
+  @Column()
+  @RelationId((tranca: TrancaEntity) => tranca.totem)
+  totemId: number;
+
+  @Column()
+  @RelationId((tranca: TrancaEntity) => tranca.bicicleta)
+  bicicletaId: number;
 
   static toDomain(trancaEntity: TrancaEntity) {
     const tranca = new Tranca();
