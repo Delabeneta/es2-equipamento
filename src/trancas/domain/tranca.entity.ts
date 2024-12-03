@@ -12,6 +12,7 @@ export class TrancaEntity {
   totem: TotemEntity | null;
   totemId: number;
   bicicletaid: number;
+  funcionarioId: number;
 
   static toDomain(trancaEntity: TrancaEntity) {
     const tranca = new Tranca();

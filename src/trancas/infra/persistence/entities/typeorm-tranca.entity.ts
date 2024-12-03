@@ -34,4 +34,6 @@ export class TypeormTrancaEntity {
   @Column({ nullable: true })
   @RelationId((tranca: TypeormTrancaEntity) => tranca.bicicleta)
   bicicletaid: number;
+  @Column({ nullable: true })
+  funcionarioId: number;
 }

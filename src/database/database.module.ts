@@ -19,6 +19,8 @@ import { DataSource } from 'typeorm';
           synchronize: true,
           entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         });
+        // console.log(dataSource); //<- log here to check they are filled correctly
+
         await dataSource.initialize();
         return dataSource;
       },

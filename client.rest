@@ -75,7 +75,23 @@ Content-Type: application/json
     "modelo": "ccccc"
 }
 
+POST {{baseurl}}/trancas/
+Content-Type: application/json
+{
+   "idBicicleta": "3",
+    "idTranca": "1",
+    "idFuncionario": "2"
+}
 
+###
+
+POST http://localhost:3000/trancas/incluir-no-totem
+ontent-Type: application/json
+ {
+     "trancaId": "1",
+     "totemId": "1", 
+     "funcionarioId": "12345"
+     }
 
 ###
 

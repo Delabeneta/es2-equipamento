@@ -6,6 +6,7 @@ import { Tranca, TrancaStatus } from '../trancas/domain/tranca';
 import { generateRandomNumber } from '../utils/random-number';
 import { TrancaRepository } from '../trancas/domain/tranca.repository';
 import { TrancaEntity } from './domain/tranca.entity';
+import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 
 //  @InjectRepository é usado para injetar um repositório
 // associado a uma entidade diretamente no serviço.
@@ -17,6 +18,7 @@ import { TrancaEntity } from './domain/tranca.entity';
 
 @Injectable()
 export class TrancasService {
+  totemRepository: any;
   constructor(
     @Inject('TrancaRepository')
     private readonly trancaRepository: TrancaRepository, //
@@ -65,6 +67,21 @@ export class TrancasService {
 
   }
 
-
-
-}
+  
+  async incluirNoTotem(incluirTrancaDto: IncluirTrancaDto) {
+     const { trancaId, totemId, funcionarioId } = incluirTrancaDto;
+     const tranca = await this.trancaRepository.findById(trancaId); 
+     
+     if (!tranca) { throw new Error('Tranca não encontrada'); }
+     if (tranca.status !== TrancaStatus.NOVA && tranca.status !== TrancaStatus.EM_REPARO) { throw new Error('Tranca está com status inválido para inserir no totem'); } 
+     if (tranca.status === TrancaStatus.EM_REPARO && tranca.funcionarioId !== funcionarioId) { throw new Error('Ação não permitida'); }
+     
+     const totem = await this.totemRepository.findById(totemId);
+    if (!totem) { throw new Error('Totem não encontrado'); } 
+    
+    await this.trancaRepository.update(trancaId, { 
+      status: TrancaStatus.LIVRE, totem: { id: totemId }, }); 
+      
+      return { message: 'Tranca inserida!' };
+    }
+  }

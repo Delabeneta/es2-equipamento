@@ -11,6 +11,7 @@ import {
 import { TrancasService } from '../trancas/trancas.service';
 import { CreateTrancaDto } from '../trancas/dto/create-tranca.dto';
 import { UpdateTrancaDto } from '../trancas/dto/update-tranca.dto';
+import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 
 @Controller('Trancas')
 export class TrancasController {
@@ -37,5 +38,10 @@ export class TrancasController {
   @Delete(':idTranca')
   async delete(@Param('idTranca') idTranca: number) {
     return this.trancasService.delete(idTranca);
+  }
+
+  @Post('incluir-no-totem')
+  async incluirNoTotem(@Body() incluirTrancaDto: IncluirTrancaDto) {
+    return this.trancasService.incluirNoTotem(incluirTrancaDto);
   }
 }
