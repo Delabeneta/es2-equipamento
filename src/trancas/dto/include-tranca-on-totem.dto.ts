@@ -5,4 +5,6 @@ export class IncludeTrancaOnTotemDto {
   idTranca: number;
   @IsNumber()
   idFuncionario: number;
+  @IsNumber()
+  idTotem: number;
 }

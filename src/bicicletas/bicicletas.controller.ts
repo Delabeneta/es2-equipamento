@@ -50,7 +50,7 @@ export class BicicletasController {
     return this.bicicletasService.changeStatus(idBicicleta, acao);
   }
 
-  @Post('integrarNaRede')
+  @Post('/integrarNaRede')
   async integrarNaRede(
     @Body() includeBicicletaOnTrancaDto: IncludeBicicletaOnTrancaDto,
   ) {

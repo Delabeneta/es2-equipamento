@@ -71,7 +71,7 @@ export class BicicletasService {
 
     if (!bicicleta) {
       throw new Error('Bicicleta nao encontrada');
-    } // validar numero da bicicleta
+    }
 
     if (
       bicicleta.status !== BicicletaStatus.NOVA &&
@@ -104,8 +104,6 @@ export class BicicletasService {
       status: TrancaStatus.OCUPADA,
       bicicleta: { id: bicicleta.id },
     });
-
-    return { message: 'bicicleta inserida!' };
   }
 
   async changeStatus(idBicicleta: number, acao: string) {

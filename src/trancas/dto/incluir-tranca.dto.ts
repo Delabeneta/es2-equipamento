@@ -2,11 +2,11 @@ import { IsNumber } from 'class-validator';
 
 export class IncluirTrancaDto {
   @IsNumber()
-  trancaId: number;
+  idTranca: number;
 
   @IsNumber()
-  totemId: number;
+  idTotem: number;
 
   @IsNumber()
-  funcionarioId: number;
+  idFuncionario: number;
 }

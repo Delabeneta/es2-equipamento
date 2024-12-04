@@ -21,7 +21,7 @@ export class TrancaEntity {
     tranca.bicicleta = 0;
     tranca.anoDeFabricacao = trancaEntity.anoDeFabricacao;
     if (trancaEntity.bicicleta) {
-      tranca.bicicleta = trancaEntity.bicicleta.numero;
+      tranca.bicicleta = trancaEntity.bicicleta.id;
     }
     tranca.id = trancaEntity.id;
     if (trancaEntity.totem) {

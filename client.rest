@@ -24,9 +24,9 @@ POST {{baseurl}}/bicicleta/
 Content-Type: application/json
 
 {   
-    "ano": "22222",
-    "modelo": "eeee",
-    "marca": "ccc"
+    "ano": "2005",
+    "modelo": "bmx",
+    "marca": "monarc"
 }
 
 
@@ -43,18 +43,19 @@ Content-Type: application/json
 } 
 
 ###
-POST http://localhost:3000/bicicleta/integrarNaRede/
+POST {{baseurl}}/bicicleta/integrarNaRede/
 Content-Type: application/json
+
 {
-   "idBicicleta": "3",
-    "idTranca": "1",
-    "idFuncionario": "2"
+   "idBicicleta": 1,
+    "idTranca": 1,
+    "idFuncionario": 1
 }
 
 
-### TRANCAS
+############### TRANCAS
 
-Get {{baseurl}}/trancas/
+Get {{baseurl}}/tranca/
 ###
 
 
@@ -67,13 +68,25 @@ Content-Type: application/json
 
 
 ###
-POST {{baseurl}}/trancas/
+Post {{baseurl}}/tranca/integrarNaRede
+Content-Type: application/json
+
+{
+    "idTranca": 1,
+    "idFuncionario": 0,
+    "idTotem": 1 
+}
+
+###
+POST {{baseurl}}/tranca/
 Content-Type: application/json
 
 {   
-    "anoDeFabricacao": "2222",
-    "modelo": "ccccc"
+    "anoDeFabricacao": "2020",
+    "modelo": "Elon musk"
 }
+
+###
 
 POST {{baseurl}}/trancas/
 Content-Type: application/json
@@ -117,12 +130,12 @@ POST {{baseurl}}/totem/
 Content-Type: application/json
 
 {   
-    "localizacao": "amage2",
-    "descricao": "aaaperto da Upa2"
+    "localizacao": "urca",
+    "descricao": "Unirio 458"
 }
 
 
 
 ###
 
-DELETE {{baseurl}}/totem/5/
+DELETE {{baseurl}}/totem/2/

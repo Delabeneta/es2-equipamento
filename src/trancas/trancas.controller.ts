@@ -13,11 +13,11 @@ import { CreateTrancaDto } from '../trancas/dto/create-tranca.dto';
 import { UpdateTrancaDto } from '../trancas/dto/update-tranca.dto';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 
-@Controller('Trancas')
+@Controller('/tranca')
 export class TrancasController {
   constructor(private readonly trancasService: TrancasService) {}
 
-  @Post()
+  @Post('/')
   create(@Body() createTrancaDto: CreateTrancaDto) {
     return this.trancasService.create(createTrancaDto);
   }
@@ -40,7 +40,7 @@ export class TrancasController {
     return this.trancasService.delete(idTranca);
   }
 
-  @Post('incluir-no-totem')
+  @Post('/integrarNaRede')
   async inserirNoTotem(@Body() incluirTrancaDto: IncluirTrancaDto) {
     return this.trancasService.incluirNoTotem(incluirTrancaDto);
   }
