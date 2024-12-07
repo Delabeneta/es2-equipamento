@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
 import { BicicletaRepository } from './domain/bicicleta.repository';
-import { generateRandomNumber } from 'src/utils/random-number';
+import { generateRandomNumber } from 'src/common/utils/random-number';
 import { BicicletaStatus } from './domain/bicicleta';
 import { UpdateBicicletaDto } from './dto/update-bicicleta.dto';
 import { TrancaRepository } from 'src/trancas/domain/tranca.repository';

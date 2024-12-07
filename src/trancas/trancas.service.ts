@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CreateTrancaDto } from '../trancas/dto/create-tranca.dto';
 import { UpdateTrancaDto } from '../trancas/dto/update-tranca.dto';
 import { Tranca, TrancaStatus } from '../trancas/domain/tranca';
-import { generateRandomNumber } from '../utils/random-number';
+import { generateRandomNumber } from '../common/utils/random-number';
 import { TrancaRepository } from '../trancas/domain/tranca.repository';
 import { TrancaEntity } from './domain/tranca.entity';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
