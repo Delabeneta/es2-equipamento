@@ -74,10 +74,10 @@ POST {{baseurl}}/tranca/
 Content-Type: application/json
 
 {   
-    "anoDeFabricacao": "2024",
+    "anoDeFabricacao": "2023",
     "modelo": "Itau"
 }
-###
+####
 
 # Excluir uma tranca
 DELETE {{baseurl}}/tranca/1/

@@ -7,7 +7,7 @@ describe('TrancaEntity', () => {
   describe('toDomain', () => {
     it('should map a TrancaEntity to a Tranca domain object', () => {
       const bicicleta = new BicicletaEntity();
-      bicicleta.numero = 101;
+      bicicleta.id = 1;
 
       const totem = new TotemEntity();
       totem.localizacao = 'Parque Central';
@@ -28,7 +28,7 @@ describe('TrancaEntity', () => {
       expect(trancaDomain.status).toBe(TrancaStatus.LIVRE);
       expect(trancaDomain.modelo).toBe('Modelo X');
       expect(trancaDomain.anoDeFabricacao).toBe('2022');
-      expect(trancaDomain.bicicleta).toBe(101);
+      expect(trancaDomain.bicicleta).toBe(1);
       expect(trancaDomain.localizacao).toBe('Parque Central');
     });
 
