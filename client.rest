@@ -33,7 +33,7 @@ Content-Type: application/json
 
 ###
 
-DELETE {{baseurl}}/bicicletas/1/
+DELETE {{baseurl}}/bicicleta/1/
 Content-Type: application/json
 
 {   

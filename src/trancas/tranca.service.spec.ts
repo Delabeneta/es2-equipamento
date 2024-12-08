@@ -40,6 +40,10 @@ describe('TrancaService', () => {
           provide: 'TrancaRepository',
           useValue: repository,
         },
+        {
+          provide: 'TotemRepository',
+          useValue: null,
+        },
       ],
     }).compile();
 
