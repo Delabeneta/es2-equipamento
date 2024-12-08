@@ -89,7 +89,6 @@ export class BicicletasService {
       throw new Error('Ação nao permitida');
     }
 
-    // 4. Solicitar o fechamento da tranca.
     const tranca = await this.trancaRepository.findById(idTranca);
     if (!tranca) throw new Error('Tranca não encontrada');
     if (tranca.status !== TrancaStatus.LIVRE) {
