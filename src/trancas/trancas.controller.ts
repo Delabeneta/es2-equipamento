@@ -39,7 +39,7 @@ export class TrancasController {
   async delete(@Param('idTranca') idTranca: number) {
     return this.trancasService.delete(idTranca);
   }
-
+  // inserir tranca nova ou em reparo no totem
   @Post('/integrarNaRede')
   async inserirNoTotem(@Body() incluirTrancaDto: IncluirTrancaDto) {
     return this.trancasService.incluirNoTotem(incluirTrancaDto);

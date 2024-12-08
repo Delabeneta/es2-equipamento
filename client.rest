@@ -1,141 +1,113 @@
-
-
 @baseurl = http://localhost:3000
 
+### BICICLETAS
 
-# Bicicletas
-
-Get {{baseurl}}/bicicleta
+# Obter todas as bicicletas
+GET {{baseurl}}/bicicleta
 ###
 
-
-PUT {{baseurl}}/bicicleta/3/
+# Atualizar dados de uma bicicleta
+PUT {{baseurl}}/bicicleta/1/
 Content-Type: application/json
 
 {   
-    "ano": "2025",
-    "modelo": "monarc",
-    "marca": "vermelho"
+    "ano": "2006",
+    "modelo": "Tarmac",
+    "marca": "Specialized"
 }
-
-
 ###
+
+# Criar uma nova bicicleta
 POST {{baseurl}}/bicicleta/
 Content-Type: application/json
 
 {   
-    "ano": "2005",
-    "modelo": "bmx",
-    "marca": "monarc"
+    "ano": "2022",
+    "modelo": "Marlin",
+    "marca": "Trek"
 }
-
-
-
 ###
 
-DELETE {{baseurl}}/bicicletas/1/
-Content-Type: application/json
-
-{   
-    "ano": "2025",
-    "modelo": "monarc",
-    "marca": "vermelho"
-} 
-
+# Excluir uma bicicleta
+DELETE {{baseurl}}/bicicleta/5/
 ###
+
+# Integrar bicicleta na rede
 POST {{baseurl}}/bicicleta/integrarNaRede/
 Content-Type: application/json
 
 {
-   "idBicicleta": 1,
-    "idTranca": 1,
-    "idFuncionario": 1
+   "idBicicleta": 5,
+   "idTranca": 2,
+   "idFuncionario": 1
 }
-
-
-############### TRANCAS
-
-Get {{baseurl}}/tranca/
 ###
 
+### TRANCAS
 
-PUT {{baseurl}}/trancas/1/
+# Obter todas as trancas
+GET {{baseurl}}/tranca/
+###
+
+# Atualizar dados de uma tranca
+PUT {{baseurl}}/tranca/1/
 Content-Type: application/json
 
 {   
     "anoDeFabricacao": "2000"
 }
-
-
 ###
-Post {{baseurl}}/tranca/integrarNaRede
+
+# Integrar tranca na rede
+POST {{baseurl}}/tranca/integrarNaRede
 Content-Type: application/json
 
 {
-    "idTranca": 1,
+    "idTranca": 3,
     "idFuncionario": 0,
-    "idTotem": 1 
+    "idTotem": 1
 }
-
 ###
+
+# Criar uma nova tranca
 POST {{baseurl}}/tranca/
 Content-Type: application/json
 
 {   
-    "anoDeFabricacao": "2020",
-    "modelo": "Elon musk"
+    "anoDeFabricacao": "2024",
+    "modelo": "Itau"
 }
-
 ###
 
-POST {{baseurl}}/trancas/
-Content-Type: application/json
-{
-   "idBicicleta": "3",
-    "idTranca": "1",
-    "idFuncionario": "2"
-}
-
+# Excluir uma tranca
+DELETE {{baseurl}}/tranca/1/
 ###
-
-POST {{baseurl}}/incluir-no-totem/
-Content-Type: application/json
- {
-     "trancaId": "1",
-     "totemId": "1"
-     }
-
-###
-
-DELETE {{baseurl}}/trancas/1/
-
-
 
 ### TOTEM
 
-Get {{baseurl}}/totem/
+# Obter todos os totens
+GET {{baseurl}}/totem/
 ###
 
-
+# Atualizar dados de um totem
 PUT {{baseurl}}/totem/1/
 Content-Type: application/json
 
 {   
     "anoDeFabricacao": "2000"
 }
-
-
 ###
+
+# Criar um novo totem
 POST {{baseurl}}/totem/
 Content-Type: application/json
 
 {   
-    "localizacao": "urca",
-    "descricao": "Unirio 458"
+    "localizacao": "Botafogo",
+    "descricao": "Praia Shopping"
 }
-
-
-
 ###
 
+# Excluir um totem
 DELETE {{baseurl}}/totem/2/
+###

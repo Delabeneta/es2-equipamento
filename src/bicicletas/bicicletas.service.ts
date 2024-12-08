@@ -62,6 +62,7 @@ export class BicicletasService {
     return BicicletaEntity.toDomain(createdBicicleta);
   }
 
+  // bicicleta nova ou em reparo = UC08
   async incluirBicicletaNaRede({
     idBicicleta,
     idTranca,
@@ -89,7 +90,7 @@ export class BicicletasService {
       throw new Error('Ação nao permitida');
     }
 
-    // 4. Solicitar o fechamento da tranca.
+    // 4. Solicitar o fechamento da tranca. Falta o endpoint
     const tranca = await this.trancaRepository.findById(idTranca);
     if (!tranca) throw new Error('Tranca não encontrada');
     if (tranca.status !== TrancaStatus.LIVRE) {

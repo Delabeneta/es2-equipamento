@@ -59,13 +59,15 @@ export class TrancasService {
     return TrancaEntity.toDomain(createdTranca);
   }
 
-  async incluirNoTotem(incluirTrancaDto: IncluirTrancaDto) {
-    const { idTranca, idTotem, idFuncionario } = incluirTrancaDto;
+  // tranca nova ou em reparo
+  async incluirNoTotem({ idTranca, idTotem, idFuncionario }: IncluirTrancaDto) {
     const tranca = await this.trancaRepository.findById(idTranca);
 
     if (!tranca) {
       throw new Error('Tranca não encontrada');
     }
+
+    console.log(tranca.status, 'texto');
 
     if (
       tranca.status !== TrancaStatus.NOVA &&
