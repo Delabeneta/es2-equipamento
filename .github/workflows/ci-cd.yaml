@@ -44,5 +44,5 @@ jobs:
             -Dsonar.organization=es2-pm \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info \
-            -Dsonar.exclusions=src/**/*.spec.ts \
+            -Dsonar.exclusions=./**/*.spec.ts \
             -Dsonar.coverage.exclusions=src/**/*.spec.ts
