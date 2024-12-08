@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TrancasService } from '../trancas/trancas.service';
-import { CreateTrancaDto } from '../trancas/dto/create-tranca.dto';
-import { UpdateTrancaDto } from '../trancas/dto/update-tranca.dto';
+import { TrancasService } from './trancas.service';
+import { CreateTrancaDto } from './dto/create-tranca.dto';
+import { UpdateTrancaDto } from './dto/update-tranca.dto';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 import { TrancasController } from './trancas.controller';
 
