@@ -101,6 +101,67 @@ describe('BicicletasService', () => {
     });
   });
 
+  describe('update', () => {
+    it('should throw an error if bicicleta does not exist', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue(null);
+      await expect(bicicletasService.update(1, null)).rejects.toThrow(
+        'Bicicleta nao encontrada',
+      );
+    });
+
+    it('should update if bicicleta exists', async () => {
+      const bicicleta = {
+        id: 1,
+        ano: '2022',
+        marca: 'caloi',
+        modelo: 'bmx',
+        status: BicicletaStatus.NOVA,
+        funcionarioId: 0,
+        trancaId: 0,
+      } as BicicletaEntity;
+
+      const updated = {
+        ano: '2021',
+        marca: 'teste',
+        modelo: 'teste',
+      };
+
+      bicicletaRepository.findById = jest.fn().mockResolvedValue(bicicleta);
+      bicicletaRepository.update = jest.fn().mockResolvedValue({
+        ...bicicleta,
+        ...updated,
+      });
+
+      const result = await bicicletasService.update(1, updated);
+
+      expect(result).toHaveProperty('ano', updated.ano);
+      expect(result).toHaveProperty('modelo', updated.modelo);
+      expect(result).toHaveProperty('marca', updated.marca);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all bicicletas', async () => {
+      const bicicleta = {
+        id: 1,
+        ano: '2022',
+        marca: 'caloi',
+        modelo: 'bmx',
+        status: BicicletaStatus.NOVA,
+        funcionarioId: 0,
+        trancaId: 0,
+      } as BicicletaEntity;
+
+      bicicletaRepository.findAll = jest.fn().mockResolvedValue([bicicleta]);
+
+      const bicicletaDomain = BicicletaEntity.toDomain(bicicleta);
+      const result = await bicicletasService.findAll();
+
+      expect(bicicletaRepository.findAll).toHaveBeenCalled();
+      expect(result).toStrictEqual([bicicletaDomain]);
+    });
+  });
+
   describe('incluirBicicletaNaRede', () => {
     it('should include bicicleta in the network if valid', async () => {
       bicicletaRepository.findById = jest.fn().mockResolvedValue({
@@ -226,6 +287,30 @@ describe('BicicletasService', () => {
 
       const result = await bicicletasService.changeStatus(2, 'em_uso');
       expect(result.status).toBe(BicicletaStatus.EM_USO);
+    });
+
+    it('should update the status to EM_USO when action is "em_reparo"', async () => {
+      const mockBicicleta = { id: 2, status: BicicletaStatus.NOVA };
+      bicicletaRepository.findById = jest.fn().mockResolvedValue(mockBicicleta);
+      bicicletaRepository.update = jest.fn().mockResolvedValue({
+        ...mockBicicleta,
+        status: BicicletaStatus.EM_REPARO,
+      });
+
+      const result = await bicicletasService.changeStatus(2, 'em_reparo');
+      expect(result.status).toBe(BicicletaStatus.EM_REPARO);
+    });
+
+    it('should update the status to DISPONIVEL when action is "disponivel"', async () => {
+      const mockBicicleta = { id: 2, status: BicicletaStatus.NOVA };
+      bicicletaRepository.findById = jest.fn().mockResolvedValue(mockBicicleta);
+      bicicletaRepository.update = jest.fn().mockResolvedValue({
+        ...mockBicicleta,
+        status: BicicletaStatus.DISPONIVEL,
+      });
+
+      const result = await bicicletasService.changeStatus(2, 'disponivel');
+      expect(result.status).toBe(BicicletaStatus.DISPONIVEL);
     });
 
     it('should throw an error when the bicicleta is not found', async () => {
