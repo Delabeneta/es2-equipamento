@@ -7,6 +7,7 @@ export type CreateBicicleta = {
   modelo: string;
   numero: number;
   status: BicicletaStatus;
+  funcionarioId?: number;
 };
 
 export type UpdateBicicleta = Partial<CreateBicicleta>;
@@ -17,4 +18,12 @@ export interface BicicletaRepository {
   create(bicicleta: CreateBicicleta): Promise<BicicletaEntity>;
   update(idBicicleta: number, data: UpdateBicicleta): Promise<BicicletaEntity>;
   delete(idBicicleta: number): Promise<void>;
+  saveLogInsercao(
+    idBicicleta: number,
+    logInsercao: {
+      dataHoraInsercao: string;
+      idTranca: number;
+      idFuncionario: number;
+    },
+  ): Promise<void>;
 }

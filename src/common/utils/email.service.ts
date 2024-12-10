@@ -6,7 +6,9 @@ import { Injectable } from '@nestjs/common';
 export class EmailService {
   async sendEmail(to: string, subject: string, body: string): Promise<string> {
     console.log(
-      `Envio de email para: ${to}, Assunto: ${subject}, Corpo: ${body}`,
+      `Envio de email para: ${to},
+       Assunto: ${subject},
+       Corpo: ${body}`,
     );
     return 'sucesso';
   }

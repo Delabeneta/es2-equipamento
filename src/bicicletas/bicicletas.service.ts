@@ -72,6 +72,13 @@ export class BicicletasService {
   }: IncludeBicicletaOnTrancaDto) {
     const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
 
+    const tranca = await this.trancaRepository.findById(idTranca);
+    if (!tranca) throw new Error('Tranca não encontrada');
+    if (tranca.status !== TrancaStatus.LIVRE) {
+      throw new Error('Tranca não está disponível');
+    }
+
+    // 1. Lê e valida o numero da bicicleta
     if (!bicicleta) {
       throw new Error('Bicicleta nao encontrada');
     }
@@ -89,24 +96,42 @@ export class BicicletasService {
       bicicleta.status === BicicletaStatus.EM_REPARO &&
       bicicleta.funcionarioId !== idFuncionario
     ) {
-      throw new Error('Ação nao permitida');
+      throw new Error('Funcionario nao é o mesmo que a retirou');
     }
 
-    // 4. Solicitar o fechamento da tranca.
-    const tranca = await this.trancaRepository.findById(idTranca);
-    if (!tranca) throw new Error('Tranca não encontrada');
-    if (tranca.status !== TrancaStatus.LIVRE) {
-      throw new Error('Tranca não está disponível');
-    }
+    // Registra os dados da inclusão da bicicleta
+
+    const dataHoraInsercao = new Date().toISOString();
+
+    const logInsercao = {
+      dataHoraInsercao,
+      idBicicleta,
+      idTranca,
+      idFuncionario,
+    };
+    await this.bicicletaRepository.saveLogInsercao(idBicicleta, logInsercao);
 
     await this.bicicletaRepository.update(idBicicleta, {
       status: BicicletaStatus.DISPONIVEL,
     });
 
+    bicicleta.funcionarioId = idFuncionario;
+
     await this.trancaRepository.update(idTranca, {
       status: TrancaStatus.OCUPADA,
       bicicleta: { id: bicicleta.id },
     });
+
+    const emailResponse = await this.emailService.sendEmail(
+      'reparador@equipamento.com',
+      'Inclusão de Bicicleta na Rede de Totens',
+      `A bicicleta de número ${idBicicleta} foi incluída na rede de totens. 
+      Data/Hora: ${dataHoraInsercao} 
+      Número da Tranca: ${idTranca} 
+      Reparador: ${idFuncionario}`,
+    );
+
+    console.log(`Resposta do envio de e-mail: ${emailResponse}`);
   }
 
   async retirarBicicletaDaRede({
@@ -117,7 +142,6 @@ export class BicicletasService {
   }: retirarBicicletaDaTrancaDto) {
     const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
 
-    console.log(idBicicleta, 'bicicleta');
     if (!bicicleta) {
       throw new Error('Bicicleta nao encontrada');
     }
@@ -140,12 +164,15 @@ export class BicicletasService {
       throw new Error('Tranca ou bicicleta estão em status inválido');
     }
 
-    console.log(opcao, 'tesxto da opcao');
-
     // retirar tranca da bicicleta e mudar o status
     await this.trancaRepository.update(idTranca, {
       status: TrancaStatus.LIVRE,
       bicicleta: null,
+    });
+
+    bicicleta.funcionarioId = idFuncionario; // Salvar o ID do funcionário que retirou
+    await this.bicicletaRepository.update(idBicicleta, {
+      funcionarioId: idFuncionario,
     });
 
     if (opcao === 'REPARO') {
@@ -160,8 +187,15 @@ export class BicicletasService {
 
     const dataHoraRetirada = new Date().toISOString();
 
+    const logInsercao = {
+      dataHoraInsercao: new Date().toISOString(),
+      idTranca,
+      idFuncionario,
+    };
+    await this.bicicletaRepository.saveLogInsercao(idBicicleta, logInsercao);
+
     const emailResponse = await this.emailService.sendEmail(
-      'reparador@exemplo.com',
+      'reparador@equipamento.com',
       'Retirada de Bicicleta',
       `A bicicleta de número ${idBicicleta} foi retirada para ${opcao}.
       Data/Hora: ${dataHoraRetirada}

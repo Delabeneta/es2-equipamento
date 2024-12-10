@@ -11,6 +11,7 @@ export class BicicletaEntity {
   tranca: TrancaEntity | null;
   funcionarioId: number;
   trancaId: number;
+  logsInsercao: any;
   static toDomain(entity: BicicletaEntity) {
     if (!entity) return null;
     const bicicleta = new Bicicleta();
