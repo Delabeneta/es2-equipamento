@@ -7,10 +7,12 @@ import { TrancasModule } from 'src/trancas/trancas.module';
 import { TypeormTrancaRepository } from 'src/trancas/infra/persistence/repositories/typeorm-tranca.repository';
 import { TypeormBicicletaEntity } from './infra/persistence/entities/typeorm-bicicleta.entity';
 import { TypeormTrancaEntity } from 'src/trancas/infra/persistence/entities/typeorm-tranca.entity';
+import { EmailService } from 'src/common/utils/email.service';
 
 @Module({
   imports: [TrancasModule],
   providers: [
+    EmailService,
     BicicletasService,
     {
       provide: 'BicicletaRepository',

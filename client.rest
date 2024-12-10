@@ -22,14 +22,14 @@ POST {{baseurl}}/bicicleta/
 Content-Type: application/json
 
 {   
-    "ano": "2022",
-    "modelo": "Marlin",
-    "marca": "Trek"
+    "ano": "1999",
+    "modelo": "Tarmac",
+    "marca": "Specialized"
 }
 ###
 
 # Excluir uma bicicleta
-DELETE {{baseurl}}/bicicleta/5/
+DELETE {{baseurl}}/bicicleta/1/
 ###
 
 # Integrar bicicleta na rede
@@ -37,11 +37,29 @@ POST {{baseurl}}/bicicleta/integrarNaRede/
 Content-Type: application/json
 
 {
-   "idBicicleta": 5,
-   "idTranca": 2,
-   "idFuncionario": 1
+   "idBicicleta": 4,
+   "idTranca": 3,
+   "idFuncionario": 0
 }
 ###
+
+### mudar status
+
+POST {{baseurl}}/bicicleta/4/status/REPARO_SOLICITADO/
+
+
+
+###
+# retirar da Rede 
+POST {{baseurl}}/bicicleta/retirarDaRede/
+Content-Type: application/json
+
+{
+   "idBicicleta": 4,
+   "idTranca": 3,
+   "idFuncionario": 0,
+   "opcao": "'REPARO"
+}
 
 ### TRANCAS
 
@@ -75,7 +93,7 @@ Content-Type: application/json
 
 {   
     "anoDeFabricacao": "2023",
-    "modelo": "Itau"
+    "modelo": "Elon Musk"
 }
 ####
 
@@ -103,8 +121,8 @@ POST {{baseurl}}/totem/
 Content-Type: application/json
 
 {   
-    "localizacao": "Botafogo",
-    "descricao": "Praia Shopping"
+    "localizacao": "Urca",
+    "descricao": "Unirio 458"
 }
 ###
 

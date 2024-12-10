@@ -13,8 +13,11 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
     private readonly repository: Repository<TypeormBicicletaEntity>,
   ) {}
   findById(idBicicleta: number): Promise<BicicletaEntity> {
-    return this.repository.findOneBy({
-      id: idBicicleta,
+    return this.repository.findOne({
+      where: {
+        id: idBicicleta,
+        status: Not(BicicletaStatus.EXCLUIDA),
+      },
     });
   }
   async delete(idBicicleta: number): Promise<void> {

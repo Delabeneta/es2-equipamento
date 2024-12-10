@@ -17,7 +17,7 @@ describe('TypeormBicicletaRepository', () => {
 
   beforeEach(() => {
     mockRepository = {
-      findOneBy: jest.fn(),
+      findOne: jest.fn(),
       update: jest.fn(),
       find: jest.fn(),
       create: jest.fn(),
@@ -32,11 +32,11 @@ describe('TypeormBicicletaRepository', () => {
         id: 1,
         status: BicicletaStatus.NOVA,
       } as TypeormBicicletaEntity;
-      jest.spyOn(mockRepository, 'findOneBy').mockResolvedValue(bicicleta);
+      jest.spyOn(mockRepository, 'findOne').mockResolvedValue(bicicleta);
 
       const result = await repository.findById(1);
 
-      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 1 });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ id: 1 });
       expect(result).toEqual(bicicleta);
     });
   });
@@ -77,14 +77,12 @@ describe('TypeormBicicletaRepository', () => {
       } as TypeormBicicletaEntity;
 
       jest.spyOn(mockRepository, 'update').mockResolvedValue(undefined);
-      jest
-        .spyOn(mockRepository, 'findOneBy')
-        .mockResolvedValue(updatedBicicleta);
+      jest.spyOn(mockRepository, 'findOne').mockResolvedValue(updatedBicicleta);
 
       const result = await repository.update(1, updatedData);
 
       expect(mockRepository.update).toHaveBeenCalledWith(1, updatedData);
-      expect(mockRepository.findOneBy).toHaveBeenCalledWith({ id: 1 });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({ id: 1 });
       expect(result).toEqual(updatedBicicleta);
     });
   });

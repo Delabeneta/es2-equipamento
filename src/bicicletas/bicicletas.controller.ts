@@ -13,6 +13,7 @@ import { BicicletasService } from './bicicletas.service';
 import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
 import { UpdateBicicletaDto } from './dto/update-bicicleta.dto';
 import { IncludeBicicletaOnTrancaDto } from './dto/include-bicicleta-on-tranca.dto';
+import { retirarBicicletaDaTrancaDto } from './dto/retirar-bicicleta-on-tranca';
 
 @Controller('bicicleta')
 export class BicicletasController {
@@ -59,12 +60,12 @@ export class BicicletasController {
     );
   }
 
-  /*@Post('retirarDaRede')
+  @Post('/retirarDaRede')
   async retirarDaRede(
-    @Body() includeBicicletaOnTrancaDto: IncludeBicicletaOnTrancaDto,
+    @Body() retirarBicicletaDaTrancaDto: retirarBicicletaDaTrancaDto,
   ) {
     return this.bicicletasService.retirarBicicletaDaRede(
-      includeBicicletaOnTrancaDto,
+      retirarBicicletaDaTrancaDto,
     );
-  } */
+  }
 }
