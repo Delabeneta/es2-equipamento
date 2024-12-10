@@ -6,6 +6,11 @@ import { BicicletaRepository } from './domain/bicicleta.repository';
 import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
 import { BicicletaEntity } from './domain/bicicleta.entity';
 import { TrancaStatus } from 'src/trancas/domain/tranca';
+import { EmailService } from 'src/common/utils/email.service';
+
+const mockEmailService = {
+  sendEmail: jest.fn(), // Simula o método sendEmail
+};
 
 describe('BicicletasService', () => {
   let bicicletasService: BicicletasService;
@@ -31,6 +36,7 @@ describe('BicicletasService', () => {
         BicicletasService,
         { provide: 'BicicletaRepository', useValue: bicicletaRepository },
         { provide: 'TrancaRepository', useValue: trancaRepository },
+        { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
 
@@ -265,7 +271,7 @@ describe('BicicletasService', () => {
   });
 
   describe('changeStatus', () => {
-    it('should update the status to APOSENTADA when action is "aposentar"', async () => {
+    it('should update the status to APOSENTADA when action is "APOSENTAR"', async () => {
       const mockBicicleta = { id: 1, status: BicicletaStatus.NOVA };
       bicicletaRepository.findById = jest.fn().mockResolvedValue(mockBicicleta);
       bicicletaRepository.update = jest.fn().mockResolvedValue({
@@ -273,11 +279,11 @@ describe('BicicletasService', () => {
         status: BicicletaStatus.APOSENTADA,
       });
 
-      const result = await bicicletasService.changeStatus(1, 'aposentar');
+      const result = await bicicletasService.changeStatus(1, 'APOSENTAR');
       expect(result.status).toBe(BicicletaStatus.APOSENTADA);
     });
 
-    it('should update the status to EM_USO when action is "em_uso"', async () => {
+    it('should update the status to EM_USO when action is "EM_USO"', async () => {
       const mockBicicleta = { id: 2, status: BicicletaStatus.NOVA };
       bicicletaRepository.findById = jest.fn().mockResolvedValue(mockBicicleta);
       bicicletaRepository.update = jest.fn().mockResolvedValue({
@@ -285,11 +291,11 @@ describe('BicicletasService', () => {
         status: BicicletaStatus.EM_USO,
       });
 
-      const result = await bicicletasService.changeStatus(2, 'em_uso');
+      const result = await bicicletasService.changeStatus(2, 'EM_USO');
       expect(result.status).toBe(BicicletaStatus.EM_USO);
     });
 
-    it('should update the status to EM_USO when action is "em_reparo"', async () => {
+    it('should update the status to EM_USO when action is "EM_REPARO"', async () => {
       const mockBicicleta = { id: 2, status: BicicletaStatus.NOVA };
       bicicletaRepository.findById = jest.fn().mockResolvedValue(mockBicicleta);
       bicicletaRepository.update = jest.fn().mockResolvedValue({
@@ -297,7 +303,7 @@ describe('BicicletasService', () => {
         status: BicicletaStatus.EM_REPARO,
       });
 
-      const result = await bicicletasService.changeStatus(2, 'em_reparo');
+      const result = await bicicletasService.changeStatus(2, 'EM_REPARO');
       expect(result.status).toBe(BicicletaStatus.EM_REPARO);
     });
 
@@ -309,7 +315,7 @@ describe('BicicletasService', () => {
         status: BicicletaStatus.DISPONIVEL,
       });
 
-      const result = await bicicletasService.changeStatus(2, 'disponivel');
+      const result = await bicicletasService.changeStatus(2, 'DISPONIVEL');
       expect(result.status).toBe(BicicletaStatus.DISPONIVEL);
     });
 
@@ -317,7 +323,7 @@ describe('BicicletasService', () => {
       bicicletaRepository.findById = jest.fn().mockResolvedValue(null);
 
       await expect(
-        bicicletasService.changeStatus(1, 'aposentar'),
+        bicicletasService.changeStatus(1, 'APOSENTAR'),
       ).rejects.toThrow('Bicicleta não encontrada');
     });
 

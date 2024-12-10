@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { TypeormBicicletaRepository } from './typeorm-bicicleta.repository';
 import { TypeormBicicletaEntity } from '../entities/typeorm-bicicleta.entity';
 import { BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
@@ -36,7 +36,12 @@ describe('TypeormBicicletaRepository', () => {
 
       const result = await repository.findById(1);
 
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ id: 1 });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: bicicleta.id,
+          status: Not(BicicletaStatus.EXCLUIDA),
+        },
+      });
       expect(result).toEqual(bicicleta);
     });
   });
@@ -82,7 +87,12 @@ describe('TypeormBicicletaRepository', () => {
       const result = await repository.update(1, updatedData);
 
       expect(mockRepository.update).toHaveBeenCalledWith(1, updatedData);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ id: 1 });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: 1,
+          status: Not(BicicletaStatus.EXCLUIDA),
+        },
+      });
       expect(result).toEqual(updatedBicicleta);
     });
   });

@@ -58,7 +58,7 @@ Content-Type: application/json
    "idBicicleta": 4,
    "idTranca": 3,
    "idFuncionario": 0,
-   "opcao": "'REPARO"
+   "opcao": "REPARO"
 }
 
 ### TRANCAS

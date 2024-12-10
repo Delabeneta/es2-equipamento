@@ -8,5 +8,5 @@ export class retirarBicicletaDaTrancaDto {
   @IsNumber()
   idBicicleta: number;
   @IsString()
-  opcao: string;
+  opcao?: string;
 }

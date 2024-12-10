@@ -20,6 +20,7 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
       },
     });
   }
+
   async delete(idBicicleta: number): Promise<void> {
     await this.repository.update(idBicicleta, {
       status: BicicletaStatus.EXCLUIDA,
@@ -40,8 +41,11 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
     data: UpdateBicicleta,
   ): Promise<BicicletaEntity> {
     await this.repository.update(idBicicleta, data);
-    return this.repository.findOneBy({
-      id: idBicicleta,
+    return this.repository.findOne({
+      where: {
+        id: idBicicleta,
+        status: Not(BicicletaStatus.EXCLUIDA),
+      },
     });
   }
 
