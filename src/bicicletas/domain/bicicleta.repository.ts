@@ -20,7 +20,7 @@ export interface BicicletaRepository {
   delete(idBicicleta: number): Promise<void>;
   saveLogInsercao(
     idBicicleta: number,
-    logInsercao: {
+    LogInsercao: {
       dataHoraInsercao: string;
       idTranca: number;
       idFuncionario: number;

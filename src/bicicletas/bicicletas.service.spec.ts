@@ -24,6 +24,7 @@ describe('BicicletasService', () => {
       update: jest.fn(),
       findAll: jest.fn(),
       delete: jest.fn(),
+      saveLogInsercao: jest.fn(),
     };
 
     trancaRepository = {
@@ -94,7 +95,7 @@ describe('BicicletasService', () => {
         .mockResolvedValue({ status: BicicletaStatus.NOVA });
 
       await expect(bicicletasService.delete(1)).rejects.toThrow(
-        'Apenas Bicicletas aposentadas podem ser excluidas',
+        'Apenas bicicletas aposentadas podem ser excluídas',
       );
     });
 
@@ -205,7 +206,7 @@ describe('BicicletasService', () => {
           idFuncionario: 123,
         }),
       ).rejects.toThrow(
-        'Bicicleta está com Status inválido para inserir no totem',
+        'Bicicleta está com status inválido para inserir no totem',
       );
     });
 
@@ -221,7 +222,7 @@ describe('BicicletasService', () => {
           idTranca: 1,
           idFuncionario: 123,
         }),
-      ).rejects.toThrow('Ação nao permitida');
+      ).rejects.toThrow('Funcionário não é o mesmo que a retirou');
     });
 
     it('should throw an error if bicicleta is not found', async () => {
@@ -270,6 +271,10 @@ describe('BicicletasService', () => {
     });
   });
 
+  /// funcao para registrar
+  // teste de sucesso para envio de registro - unico possível
+
+  /// mudança de status
   describe('changeStatus', () => {
     it('should update the status to APOSENTADA when action is "APOSENTAR"', async () => {
       const mockBicicleta = { id: 1, status: BicicletaStatus.NOVA };

@@ -4,6 +4,7 @@ import { BicicletasService } from './bicicletas.service';
 import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
 import { UpdateBicicletaDto } from './dto/update-bicicleta.dto';
 import { IncludeBicicletaOnTrancaDto } from './dto/include-bicicleta-on-tranca.dto';
+import { RetirarBicicletaDaTrancaDto } from './dto/retirar-bicicleta-on-tranca';
 
 describe('BicicletasController', () => {
   let bicicletasController: BicicletasController;
@@ -16,6 +17,7 @@ describe('BicicletasController', () => {
     delete: jest.fn(),
     changeStatus: jest.fn(),
     incluirBicicletaNaRede: jest.fn(),
+    retirarBicicletaDaRede: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -114,19 +116,20 @@ describe('BicicletasController', () => {
     });
   });
 
-  // Uncomment and implement if retirarDaRede method is added
-  // describe('retirarDaRede', () => {
-  //   it('should call BicicletasService.retirarBicicletaDaRede with correct data', async () => {
-  //     const includeBicicletaOnTrancaDto: IncludeBicicletaOnTrancaDto = {
-  //       idBicicleta: 1,
-  //       idTranca: 2,
-  //     };
+  describe('retirarDaRede', () => {
+    it('should call BicicletasService.retirarBicicletaDaRede with correct data', async () => {
+      const retirarBicicletaDaTrancaDto: RetirarBicicletaDaTrancaDto = {
+        idBicicleta: 1,
+        idTranca: 2,
+        idFuncionario: 0,
+        opcao: 'REPARO',
+      };
 
-  //     await bicicletasController.retirarDaRede(includeBicicletaOnTrancaDto);
+      await bicicletasController.retirarDaRede(retirarBicicletaDaTrancaDto);
 
-  //     expect(bicicletasService.retirarBicicletaDaRede).toHaveBeenCalledWith(
-  //       includeBicicletaOnTrancaDto,
-  //     );
-  //   });
-  // });
+      expect(bicicletasService.retirarBicicletaDaRede).toHaveBeenCalledWith(
+        retirarBicicletaDaTrancaDto,
+      );
+    });
+  });
 });

@@ -1,6 +1,6 @@
 import { IsNumber, IsString } from 'class-validator';
 
-export class retirarBicicletaDaTrancaDto {
+export class RetirarBicicletaDaTrancaDto {
   @IsNumber()
   idTranca: number;
   @IsNumber()

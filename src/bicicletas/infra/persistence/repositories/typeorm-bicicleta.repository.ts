@@ -53,23 +53,19 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
     const entity = this.repository.create(bicicleta);
     return this.repository.save(entity);
   }
-
   async saveLogInsercao(
     idBicicleta: number,
-    logInsercao: {
+    LogInsercao: {
       dataHoraInsercao: string;
       idTranca: number;
       idFuncionario: number;
     },
   ) {
     const bicicleta = await this.findById(idBicicleta);
-    if (!bicicleta) {
-      throw new Error('Bicicleta não encontrada');
-    }
     if (!bicicleta.logsInsercao) {
       bicicleta.logsInsercao = [];
     }
-    bicicleta.logsInsercao.push(logInsercao);
+    bicicleta.logsInsercao.push(LogInsercao);
     await this.create(bicicleta);
   }
 }

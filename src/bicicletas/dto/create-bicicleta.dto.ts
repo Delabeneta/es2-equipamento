@@ -1,4 +1,4 @@
-import { IsNumber, IsString, Matches } from 'class-validator';
+import { IsString, Matches } from 'class-validator';
 
 export class CreateBicicletaDto {
   @IsString()
@@ -10,7 +10,4 @@ export class CreateBicicletaDto {
   @IsString()
   @Matches(/^\d{4}$/, { message: 'Ano deve ser um ano válido (YYYY).' })
   ano: string;
-
-  @IsNumber()
-  funcionarioId;
 }
