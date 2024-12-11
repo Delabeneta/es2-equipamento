@@ -131,7 +131,7 @@ export class BicicletasService {
       Data/Hora: ${dataHoraInsercao}`,
     );
 
-    console.log(`Resposta do envio de emaim: ${emailResponse}`);
+    console.log(`Resposta do envio de email: ${emailResponse}`);
   }
 
   async retirarBicicletaDaRede({

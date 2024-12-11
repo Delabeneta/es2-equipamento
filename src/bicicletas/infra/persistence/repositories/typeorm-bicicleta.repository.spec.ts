@@ -44,6 +44,20 @@ describe('TypeormBicicletaRepository', () => {
       });
       expect(result).toEqual(bicicleta);
     });
+
+    it('should return null if bicicleta is not found', async () => {
+      jest.spyOn(mockRepository, 'findOne').mockResolvedValue(null);
+
+      const result = await repository.findById(1);
+
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: 1,
+          status: Not(BicicletaStatus.EXCLUIDA),
+        },
+      });
+      expect(result).toBeNull();
+    });
   });
 
   describe('delete', () => {
@@ -53,6 +67,14 @@ describe('TypeormBicicletaRepository', () => {
       expect(mockRepository.update).toHaveBeenCalledWith(1, {
         status: BicicletaStatus.EXCLUIDA,
       });
+    });
+
+    it('should throw an error if delete fails', async () => {
+      jest
+        .spyOn(mockRepository, 'update')
+        .mockRejectedValue(new Error('Failed to update'));
+
+      await expect(repository.delete(1)).rejects.toThrow('Failed to update');
     });
   });
 
@@ -70,6 +92,17 @@ describe('TypeormBicicletaRepository', () => {
         where: { status: expect.any(Object) },
       });
       expect(result).toEqual(bicicletas);
+    });
+
+    it('should return an empty array if no bicicletas are found', async () => {
+      jest.spyOn(mockRepository, 'find').mockResolvedValue([]);
+
+      const result = await repository.findAll();
+
+      expect(mockRepository.find).toHaveBeenCalledWith({
+        where: { status: expect.any(Object) },
+      });
+      expect(result).toEqual([]);
     });
   });
 
@@ -95,6 +128,16 @@ describe('TypeormBicicletaRepository', () => {
       });
       expect(result).toEqual(updatedBicicleta);
     });
+
+    it('should throw an error if update fails', async () => {
+      jest
+        .spyOn(mockRepository, 'update')
+        .mockRejectedValue(new Error('Update failed'));
+
+      await expect(
+        repository.update(1, { status: BicicletaStatus.EM_REPARO }),
+      ).rejects.toThrow('Update failed');
+    });
   });
 
   describe('create', () => {
@@ -112,6 +155,21 @@ describe('TypeormBicicletaRepository', () => {
       expect(mockRepository.create).toHaveBeenCalledWith(newBicicleta);
       expect(mockRepository.save).toHaveBeenCalledWith(newBicicleta);
       expect(result).toEqual(newBicicleta);
+    });
+
+    it('should throw an error if create fails', async () => {
+      jest
+        .spyOn(mockRepository, 'save')
+        .mockRejectedValue(new Error('Create failed'));
+
+      const newBicicleta = {
+        id: 1,
+        status: BicicletaStatus.DISPONIVEL,
+      } as TypeormBicicletaEntity;
+
+      await expect(repository.create(newBicicleta)).rejects.toThrow(
+        'Create failed',
+      );
     });
   });
 });
