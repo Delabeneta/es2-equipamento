@@ -10,16 +10,11 @@ import { DataSource } from 'typeorm';
       inject: [ConfigService],
       useFactory: async (config: ConfigService) => {
         const dataSource = new DataSource({
-          type: 'postgres',
-          host: config.get('DATABASE_HOST'),
-          port: parseInt(config.get('DATABASE_PORT')),
-          username: config.get('DATABASE_USER'),
-          password: config.get('DATABASE_PASSWORD'),
-          database: config.get('DATABASE_NAME'),
-          synchronize: true,
+          type: 'sqlite', // Alterado para SQLite
+          database: config.get('DATABASE_NAME'), // Caminho para o arquivo SQLite
+          synchronize: true, // Para desenvolvimento; desative em produção
           entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         });
-        // console.log(dataSource); //<- log here to check they are filled correctly
 
         await dataSource.initialize();
         return dataSource;

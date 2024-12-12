@@ -1,19 +1,10 @@
-version: '3.9'
-
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres_container
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: equipamento
-    ports:    
-    - "5432:5432"
+  nestjs-app:
+    build: .
+    container_name: sqlite_container
+    ports:
+      - "3001:3001"
     volumes:
-    - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
-    driver: local
-
+      - ./data:/app/data  # Persistir o arquivo SQLite fora do contêiner
+    environment:
+      - DATABASE_NAME=/app/data/data.db  # Definindo o caminho do banco de dados dentro do contêiner

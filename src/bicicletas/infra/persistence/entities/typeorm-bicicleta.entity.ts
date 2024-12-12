@@ -40,10 +40,6 @@ export class TypeormBicicletaEntity {
   @RelationId((bicicleta: TypeormBicicletaEntity) => bicicleta.tranca)
   trancaId: number;
 
-  @Column('jsonb', { nullable: true })
-  logsInsercao: Array<{
-    dataHoraInsercao: string;
-    idTranca: number;
-    idFuncionario: number;
-  }>;
+  @Column('text', { nullable: true })
+  logsInsercao: string;
 }

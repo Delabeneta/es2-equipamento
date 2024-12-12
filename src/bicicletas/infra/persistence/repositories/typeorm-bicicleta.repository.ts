@@ -57,14 +57,42 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
     idBicicleta: number,
     LogInsercao: {
       dataHoraInsercao: string;
+      idBicicleta: number;
       idTranca: number;
+      idFuncionario: number;
     },
   ) {
+    // Encontre a bicicleta no banco de dados
     const bicicleta = await this.findById(idBicicleta);
+
+    // Se não existir logsInsercao, inicialize como um array JSON vazio
     if (!bicicleta.logsInsercao) {
-      bicicleta.logsInsercao = [];
+      bicicleta.logsInsercao = '[]'; // Inicializa como um array vazio em formato JSON
     }
-    bicicleta.logsInsercao.push(LogInsercao);
+
+    // Verifique se logsInsercao é uma string válida (em formato JSON)
+    if (typeof bicicleta.logsInsercao === 'string') {
+      try {
+        // Converte a string JSON em um array
+        const logsArray = JSON.parse(bicicleta.logsInsercao);
+
+        // Adiciona o novo log ao array
+        logsArray.push(LogInsercao);
+
+        // Converte o array de volta para uma string JSON para salvar no banco
+        bicicleta.logsInsercao = JSON.stringify(logsArray);
+      } catch (error) {
+        console.error('Erro ao analisar logsInsercao: ', error);
+        throw new Error(
+          'Erro ao analisar os logsInsercao. Verifique os dados armazenados.',
+        );
+      }
+    } else {
+      // Caso logsInsercao não seja uma string válida, inicializa com um array contendo o log
+      bicicleta.logsInsercao = JSON.stringify([LogInsercao]);
+    }
+
+    // Salva a bicicleta com o novo log de inserção
     await this.create(bicicleta);
   }
 }

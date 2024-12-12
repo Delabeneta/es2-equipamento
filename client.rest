@@ -3,7 +3,7 @@
 ### BICICLETAS
 
 # Obter todas as bicicletas
-GET {{baseurl}}/bicicleta
+GET {{baseurl}}/bicicleta/1
 ###
 
 # Atualizar dados de uma bicicleta
@@ -18,7 +18,7 @@ Content-Type: application/json
 ###
 
 # Criar uma nova bicicleta
-POST {{baseurl}}/bicicleta/
+POST {{baseurl}}/bicicleta/1/
 Content-Type: application/json
 
 {   
@@ -29,7 +29,7 @@ Content-Type: application/json
 ###
 
 # Excluir uma bicicleta
-DELETE {{baseurl}}/bicicleta/1/
+DELETE {{baseurl}}/bicicleta/2/
 ###
 
 # Integrar bicicleta na rede
@@ -37,15 +37,15 @@ POST {{baseurl}}/bicicleta/integrarNaRede/
 Content-Type: application/json
 
 {
-   "idBicicleta": 2,
+   "idBicicleta": 1,
    "idTranca": 1,
-   "idFuncionario": 1
+   "idFuncionario": 0
 }
 ###
 
 ### mudar status
 
-POST {{baseurl}}/bicicleta/2/status/REPARO_SOLICITADO/
+POST {{baseurl}}/bicicleta/1/status/APOSENTAR/
 
 
 
@@ -55,7 +55,7 @@ POST {{baseurl}}/bicicleta/retirarDaRede/
 Content-Type: application/json
 
 {
-   "idBicicleta": 2,
+   "idBicicleta": 1,
    "idTranca": 1,
    "idFuncionario": 0,
    "opcao": "REPARO"
@@ -81,7 +81,7 @@ POST {{baseurl}}/tranca/integrarNaRede
 Content-Type: application/json
 
 {
-    "idTranca": 4,
+    "idTranca": 1,
     "idFuncionario": 0,
     "idTotem": 1
 }

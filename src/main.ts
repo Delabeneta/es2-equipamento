@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import CustomValidationPipe from './common/pipes/error-validation.pipe';
@@ -10,6 +9,6 @@ async function bootstrap() {
   app.useGlobalPipes(CustomValidationPipe);
   app.useGlobalFilters(new AppErrorFilter());
   app.useGlobalFilters(new CustomErrorValidationFilter());
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
 }
 bootstrap();

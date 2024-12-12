@@ -10,6 +10,7 @@ import { IncludeBicicletaOnTrancaDto } from './dto/include-bicicleta-on-tranca.d
 import { BicicletaEntity } from './domain/bicicleta.entity';
 import { EmailService } from 'src/common/utils/email.service';
 import { RetirarBicicletaDaTrancaDto } from './dto/retirar-bicicleta-on-tranca';
+import { AppError, AppErrorType } from 'src/common/domain/app-error';
 
 @Injectable()
 export class BicicletasService {
@@ -24,11 +25,17 @@ export class BicicletasService {
   async delete(idBicicleta: number) {
     const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
     if (!bicicleta) {
-      throw new Error('Bicicleta nao encontrada');
+      throw new AppError(
+        'Bicicleta nao encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
 
     if (bicicleta.status !== BicicletaStatus.APOSENTADA) {
-      throw new Error('Apenas bicicletas aposentadas podem ser excluídas');
+      throw new AppError(
+        'Apenas bicicletas aposentadas podem ser excluídas',
+        AppErrorType.RESOURCE_CONFLICT,
+      );
     }
 
     return this.bicicletaRepository.delete(idBicicleta);
@@ -37,7 +44,10 @@ export class BicicletasService {
   async findById(id: number) {
     const bicicletaEntity = await this.bicicletaRepository.findById(id);
     if (!bicicletaEntity) {
-      throw new Error('Bicicleta não encontrada');
+      throw new AppError(
+        'Bicicleta não encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
     return BicicletaEntity.toDomain(bicicletaEntity);
   }
@@ -50,7 +60,10 @@ export class BicicletasService {
   async update(idBicicleta: number, updateBicicletaDto: UpdateBicicletaDto) {
     const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
     if (!bicicleta) {
-      throw new Error('Bicicleta nao encontrada');
+      throw new AppError(
+        'Bicicleta nao encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
 
     const updatedBicicleta = await this.bicicletaRepository.update(
@@ -84,15 +97,19 @@ export class BicicletasService {
     const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
 
     if (!bicicleta) {
-      throw new Error('Bicicleta nao encontrada');
+      throw new AppError(
+        'Bicicleta nao encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
 
     if (
       bicicleta.status !== BicicletaStatus.NOVA &&
       bicicleta.status !== BicicletaStatus.EM_REPARO
     ) {
-      throw new Error(
+      throw new AppError(
         'Bicicleta está com status inválido para inserir no totem',
+        AppErrorType.RESOURCE_CONFLICT,
       );
     }
 
@@ -100,14 +117,24 @@ export class BicicletasService {
       bicicleta.status === BicicletaStatus.EM_REPARO &&
       bicicleta.funcionarioId !== idFuncionario
     ) {
-      throw new Error('Funcionário não é o mesmo que a retirou');
+      throw new AppError(
+        'Funcionário não é o mesmo que a retirou',
+        AppErrorType.RESOURCE_CONFLICT,
+      );
     }
 
     const tranca = await this.trancaRepository.findById(idTranca);
-    if (!tranca) throw new Error('Tranca não encontrada');
+    if (!tranca)
+      throw new AppError(
+        'Tranca não encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
 
     if (tranca.status !== TrancaStatus.LIVRE) {
-      throw new Error('Tranca não está disponível');
+      throw new AppError(
+        'Tranca não está disponível',
+        AppErrorType.RESOURCE_CONFLICT,
+      );
     }
 
     const dataHoraInsercao = new Date().toISOString();
@@ -149,25 +176,35 @@ export class BicicletasService {
     const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
 
     if (!bicicleta) {
-      throw new Error('Bicicleta nao encontrada');
+      throw new AppError(
+        'Bicicleta nao encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
 
     if (bicicleta.status !== BicicletaStatus.REPARO_SOLICITADO) {
-      throw new Error(
+      throw new AppError(
         'Bicicleta está com status inválido para retirar do totem',
+        AppErrorType.RESOURCE_CONFLICT,
       );
     }
 
     const tranca = await this.trancaRepository.findById(idTranca);
     if (!tranca) {
-      throw new Error('Tranca não encontrada');
+      throw new AppError(
+        'Tranca não encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
 
     if (
       tranca.status !== TrancaStatus.OCUPADA &&
       tranca.bicicletaId !== idBicicleta
     ) {
-      throw new Error('Tranca ou bicicleta estão em status inválido');
+      throw new AppError(
+        'Tranca ou bicicleta estão em status inválido',
+        AppErrorType.RESOURCE_CONFLICT,
+      );
     }
 
     await this.trancaRepository.update(idTranca, {
@@ -213,7 +250,10 @@ export class BicicletasService {
   async changeStatus(idBicicleta: number, acao: string) {
     const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
     if (!bicicleta) {
-      throw new Error('Bicicleta não encontrada');
+      throw new AppError(
+        'Bicicleta não encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
 
     let novoStatus;
@@ -234,7 +274,10 @@ export class BicicletasService {
         novoStatus = BicicletaStatus.REPARO_SOLICITADO;
         break;
       default:
-        throw new Error('Ação de status inválida');
+        throw new AppError(
+          'Ação de status inválida',
+          AppErrorType.RESOURCE_NOT_FOUND,
+        );
     }
 
     await this.bicicletaRepository.update(idBicicleta, { status: novoStatus });
