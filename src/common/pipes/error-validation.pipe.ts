@@ -8,7 +8,6 @@ export class CustomValidationError extends Error {
 
 const CustomValidationPipe = new ValidationPipe({
   exceptionFactory: (errors) => {
-    //console.log(errors);
     return new CustomValidationError(errors);
   },
 });
