@@ -9,7 +9,7 @@ terraform {
     bucket = "nestjs-app-terraform-states"
     region = "us-east-1"
     acl    = "bucket-owner-full-control"
-    key    = "apps/ec2-nestjs-app.tfstate"
+    key    = "apps/ec2-es2-equipamento.tfstate"
   }
 }
 
@@ -17,8 +17,8 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_security_group" "sonar_nestjs" {
-  name_prefix = "sonar_nestjs-sg"
+resource "aws_security_group" "es2-equipamento" {
+  name_prefix = "es2-equipamento-sg"
 
   ingress {
     from_port   = 80
@@ -35,11 +35,11 @@ resource "aws_security_group" "sonar_nestjs" {
   }
 }
 
-resource "aws_instance" "sonar_nestjs" {
+resource "aws_instance" "es2-equipamento" {
   ami           = "ami-006dcf34c09e50022"
   instance_type = "t2.micro"
   key_name      = "ec2"
-  vpc_security_group_ids = [aws_security_group.sonar_nestjs.id]
+  vpc_security_group_ids = [aws_security_group.es2-equipamento.id]
   user_data = base64encode(templatefile("setup.sh.tpl", {
     COMMIT = local.commit
   }))
@@ -48,16 +48,16 @@ resource "aws_instance" "sonar_nestjs" {
     create_before_destroy = true
   }
   tags = {
-    Name = "sonar_nestjs"
+    Name = "es2-equipamento"
   }
 }
 
-resource "aws_eip" "sonar_nestjs" {
-  instance = aws_instance.sonar_nestjs.id
+resource "aws_eip" "es2-equipamento" {
+  instance = aws_instance.es2-equipamento.id
 }
 
 output "elastic_ip" {
-  value = aws_eip.sonar_nestjs.public_ip
+  value = aws_eip.es2-equipamento.public_ip
 }
 
 output "app_image" { value = "${local.docker_image}:${local.commit}"}

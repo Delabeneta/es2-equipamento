@@ -8,14 +8,13 @@ import { DataSource } from 'typeorm';
     {
       provide: DataSource,
       inject: [ConfigService],
-      useFactory: async (config: ConfigService) => {
+      useFactory: async () => {
         const dataSource = new DataSource({
-          type: 'sqlite', // Alterado para SQLite
-          database: config.get('DATABASE_NAME'), // Caminho para o arquivo SQLite
-          synchronize: true, // Para desenvolvimento; desative em produção
+          type: 'sqlite',
+          database: __dirname + '/../../db.sqlite',
+          synchronize: true,
           entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         });
-
         await dataSource.initialize();
         return dataSource;
       },
