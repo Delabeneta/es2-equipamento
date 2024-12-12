@@ -3,6 +3,7 @@ import { TotemRepository } from './domain/totem.repository';
 import { Totem } from './domain/totem';
 import { CreateTotemDto } from './dto/create-totem.dto';
 import { TotemEntity } from './domain/totem.entity';
+import { AppError, AppErrorType } from 'src/common/domain/app-error';
 
 @Injectable()
 export class TotemService {
@@ -14,7 +15,10 @@ export class TotemService {
   async delete(idTotem: number) {
     const totemExistente = await this.totemRepository.findById(idTotem);
     if (!totemExistente) {
-      throw new Error('Totem não encontrada');
+      throw new AppError(
+        'Totem não encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
     return this.totemRepository.delete(idTotem);
   }
