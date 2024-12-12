@@ -23,7 +23,6 @@ export interface BicicletaRepository {
     LogInsercao: {
       dataHoraInsercao: string;
       idTranca: number;
-      idFuncionario: number;
     },
   ): Promise<void>;
 }

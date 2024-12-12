@@ -45,7 +45,7 @@ Content-Type: application/json
 
 ### mudar status
 
-POST {{baseurl}}/bicicleta/6/status/REPARO_SOLICITADO/
+POST {{baseurl}}/bicicleta/2/status/REPARO_SOLICITADO/
 
 
 
@@ -55,8 +55,8 @@ POST {{baseurl}}/bicicleta/retirarDaRede/
 Content-Type: application/json
 
 {
-   "idBicicleta": 6,
-   "idTranca": 2,
+   "idBicicleta": 2,
+   "idTranca": 1,
    "idFuncionario": 0,
    "opcao": "REPARO"
 }

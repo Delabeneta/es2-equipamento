@@ -34,6 +34,14 @@ export class BicicletasService {
     return this.bicicletaRepository.delete(idBicicleta);
   }
 
+  async findById(id: number) {
+    const bicicletaEntity = await this.bicicletaRepository.findById(id);
+    if (!bicicletaEntity) {
+      throw new Error('Bicicleta não encontrada');
+    }
+    return BicicletaEntity.toDomain(bicicletaEntity);
+  }
+
   async findAll() {
     const bicicletas = await this.bicicletaRepository.findAll();
     return bicicletas.map((bicicleta) => BicicletaEntity.toDomain(bicicleta));
@@ -124,14 +132,12 @@ export class BicicletasService {
       bicicleta: { id: bicicleta.id },
     });
 
-    const emailResponse = await this.emailService.sendEmail(
+    await this.emailService.sendEmail(
       'reparador@equipamento.com',
       'Inclusao de Bicicleta',
       `A bicicleta de número ${idBicicleta} foi incluida.
       Data/Hora: ${dataHoraInsercao}`,
     );
-
-    console.log(`Resposta do envio de email: ${emailResponse}`);
   }
 
   async retirarBicicletaDaRede({

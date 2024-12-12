@@ -3,9 +3,11 @@ export enum AppErrorType {
   RESOURCE_CONFLICT,
 }
 
-export class AppError {
+export class AppError extends Error {
   constructor(
     readonly message: string,
     readonly type: AppErrorType,
-  ) {}
+  ) {
+    super();
+  }
 }

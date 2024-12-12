@@ -58,7 +58,6 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
     LogInsercao: {
       dataHoraInsercao: string;
       idTranca: number;
-      idFuncionario: number;
     },
   ) {
     const bicicleta = await this.findById(idBicicleta);

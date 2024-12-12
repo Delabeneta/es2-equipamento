@@ -14,6 +14,7 @@ import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
 import { UpdateBicicletaDto } from './dto/update-bicicleta.dto';
 import { IncludeBicicletaOnTrancaDto } from './dto/include-bicicleta-on-tranca.dto';
 import { RetirarBicicletaDaTrancaDto } from './dto/retirar-bicicleta-on-tranca';
+import { Bicicleta } from './domain/bicicleta';
 
 @Controller('bicicleta')
 export class BicicletasController {
@@ -31,6 +32,13 @@ export class BicicletasController {
     @Body() updateBicicletaDto: UpdateBicicletaDto,
   ) {
     return this.bicicletasService.update(idBicicleta, updateBicicletaDto);
+  }
+
+  @Get(':idBicicleta')
+  async findById(
+    @Param('idBicicleta') idBicicleta: number,
+  ): Promise<Bicicleta> {
+    return await this.bicicletasService.findById(idBicicleta);
   }
 
   @Get()
