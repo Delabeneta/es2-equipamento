@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  sonar-scanner:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
