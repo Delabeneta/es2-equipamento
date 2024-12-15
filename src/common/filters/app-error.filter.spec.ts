@@ -39,6 +39,26 @@ describe('AppErrorFilter', () => {
     });
   });
 
+  it('should return 400 for RESOURCE_ERROR error', () => {
+    const exception = new AppError(
+      'Resource Error',
+      AppErrorType.RESOURCE_ERROR,
+    );
+    const host = {
+      switchToHttp: jest
+        .fn()
+        .mockReturnValue({ getResponse: jest.fn().mockReturnValue(response) }),
+    };
+
+    filter.catch(exception, host as any);
+
+    expect(response.status).toHaveBeenCalledWith(400);
+    expect(response.json).toHaveBeenCalledWith({
+      codigo: '400',
+      mensagem: 'Resource Error',
+    });
+  });
+
   it('should return 409 for RESOURCE_CONFLICT error', () => {
     const exception = new AppError(
       'Resource conflict',

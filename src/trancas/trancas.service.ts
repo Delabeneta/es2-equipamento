@@ -7,9 +7,12 @@ import { TrancaEntity } from './domain/tranca.entity';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 import { TotemRepository } from 'src/totens/domain/totem.repository';
 import { generateRandomNumber } from 'src/common/utils/random-number';
+<<<<<<< HEAD
 import { TrancamentoTrancaDto } from './dto/tracamento-tranca.dto';
 import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
 import { BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
+=======
+>>>>>>> 0521ab8a6c993786e9ad8d6450388e4b96c2e4e2
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
 
 @Injectable()
@@ -26,11 +29,17 @@ export class TrancasService {
   async delete(idTranca: number) {
     const trancaExistente = await this.trancaRepository.findById(idTranca);
     if (!trancaExistente) {
-      throw new Error('Tranca não encontrada');
+      throw new AppError(
+        'Tranca não encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
 
     if (trancaExistente.status === TrancaStatus.OCUPADA) {
-      throw new Error('Apenas Trancas sem bicicletas podem ser excluídas');
+      throw new AppError(
+        'Apenas Trancas sem bicicletas podem ser excluídas',
+        AppErrorType.RESOURCE_CONFLICT,
+      );
     }
     return this.trancaRepository.delete(idTranca);
   }
@@ -43,7 +52,10 @@ export class TrancasService {
   async update(idTranca: number, updateTrancaDto: UpdateTrancaDto) {
     const trancaExistente = await this.trancaRepository.findById(idTranca);
     if (!trancaExistente) {
-      throw new Error('Tranca não encontrada');
+      throw new AppError(
+        'Tranca não encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
     const updatedTranca = await this.trancaRepository.update(
       idTranca,
@@ -69,26 +81,35 @@ export class TrancasService {
     const tranca = await this.trancaRepository.findById(idTranca);
 
     if (!tranca) {
-      throw new Error('Tranca não encontrada');
+      throw new AppError(
+        'Tranca não encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
 
     if (
       tranca.status !== TrancaStatus.NOVA &&
       tranca.status !== TrancaStatus.EM_REPARO
     ) {
-      throw new Error('Tranca está com status inválido para inserir no totem');
+      throw new AppError(
+        'Tranca está com status inválido para inserir no totem',
+        AppErrorType.RESOURCE_CONFLICT,
+      );
     }
 
     if (
       tranca.status === TrancaStatus.EM_REPARO &&
       tranca.funcionarioId !== idFuncionario
     ) {
-      throw new Error('Ação não permitida');
+      throw new AppError('Ação não permitida', AppErrorType.RESOURCE_CONFLICT);
     }
 
     const totem = await this.totemRepository.findById(idTotem);
     if (!totem) {
-      throw new Error('Totem não encontrado');
+      throw new AppError(
+        'Totem não encontrado',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
     }
 
     await this.trancaRepository.update(idTranca, {

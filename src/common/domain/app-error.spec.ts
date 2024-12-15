@@ -20,4 +20,14 @@ describe('AppError', () => {
     expect(error.message).toBe(message);
     expect(error.type).toBe(type);
   });
+
+  it('should create an AppError with RESOURCE_NOT_FOUND type', () => {
+    const message = 'Resource Error';
+    const type = AppErrorType.RESOURCE_NOT_FOUND;
+
+    const error = new AppError(message, type);
+
+    expect(error.message).toBe(message);
+    expect(error.type).toBe(type);
+  });
 });
