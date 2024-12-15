@@ -35,7 +35,7 @@ export class TypeormTotemRepository implements TotemRepository {
   async findTrancasByTotemId(totemId: number): Promise<TrancaEntity[]> {
     const totem = await this.repository.findOne({
       where: { id: totemId },
-      relations: ['trancas'],
+      relations: ['trancas', 'trancas.bicicleta', 'trancas.totem'],
     });
     return totem.trancas;
   }
