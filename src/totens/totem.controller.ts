@@ -1,8 +1,8 @@
 import { Controller, Delete, Get, Post, Param, Body } from '@nestjs/common';
 import { TotemService } from './totem.service';
 import { CreateTotemDto } from './dto/create-totem.dto';
-import { TrancaEntity } from 'src/trancas/domain/tranca.entity';
-import { BicicletaEntity } from 'src/bicicletas/domain/bicicleta.entity';
+import { Tranca } from 'src/trancas/domain/tranca';
+import { Bicicleta } from 'src/bicicletas/domain/bicicleta';
 
 @Controller('totem')
 export class TotemController {
@@ -25,12 +25,12 @@ export class TotemController {
 
   @Get(':id/trancas') async getTrancasByTotem(
     @Param('id') id: number,
-  ): Promise<TrancaEntity[]> {
+  ): Promise<Tranca[]> {
     return this.totemService.listarTrancas(id);
   }
   @Get(':id/bicicletas') async getBicicletasByTotem(
     @Param('id') id: number,
-  ): Promise<BicicletaEntity[]> {
+  ): Promise<Bicicleta[]> {
     return this.totemService.listarBicicletas(id);
   }
 }

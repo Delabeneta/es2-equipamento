@@ -142,7 +142,7 @@ export class TrancasService {
 
       // Atualiza o status da bicicleta
       await this.bicicletaRepository.update(idBicicleta, {
-        status: BicicletaStatus.DISPONIVEL,
+        status: BicicletaStatus.EM_USO,
       });
     }
 

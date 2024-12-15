@@ -8,6 +8,8 @@ import { TrancaEntity } from 'src/trancas/domain/tranca.entity';
 import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
 import { BicicletaEntity } from 'src/bicicletas/domain/bicicleta.entity';
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
+import { Bicicleta } from 'src/bicicletas/domain/bicicleta';
+import { Tranca } from 'src/trancas/domain/tranca';
 
 @Injectable()
 export class TotemService {
@@ -43,12 +45,15 @@ export class TotemService {
     return totens.map((totem) => TotemEntity.toDomain(totem));
   }
 
-  async listarTrancas(totemId: number): Promise<TrancaEntity[]> {
-    return this.totemRepository.findTrancasByTotemId(totemId);
+  async listarTrancas(totemId: number): Promise<Tranca[]> {
+    const trancas = await this.totemRepository.findTrancasByTotemId(totemId);
+    return trancas.map((tranca) => TrancaEntity.toDomain(tranca));
   }
 
-  async listarBicicletas(totemId: number): Promise<BicicletaEntity[]> {
-    return this.totemRepository.findBicicletasByTotemId(totemId);
+  async listarBicicletas(totemId: number): Promise<Bicicleta[]> {
+    const bicicletas =
+      await this.totemRepository.findBicicletasByTotemId(totemId);
+    return bicicletas.map((bicicleta) => BicicletaEntity.toDomain(bicicleta));
   }
 
   async create(createTotemDto: CreateTotemDto) {
