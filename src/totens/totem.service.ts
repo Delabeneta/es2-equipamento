@@ -46,11 +46,25 @@ export class TotemService {
   }
 
   async listarTrancas(totemId: number): Promise<Tranca[]> {
+    const totem = this.totemRepository.findById(totemId);
+    if (!totem) {
+      throw new AppError(
+        'Totem não encontrado',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
+    }
     const trancas = await this.totemRepository.findTrancasByTotemId(totemId);
     return trancas.map((tranca) => TrancaEntity.toDomain(tranca));
   }
 
   async listarBicicletas(totemId: number): Promise<Bicicleta[]> {
+    const totem = this.totemRepository.findById(totemId);
+    if (!totem) {
+      throw new AppError(
+        'Totem não encontrado',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
+    }
     const bicicletas =
       await this.totemRepository.findBicicletasByTotemId(totemId);
     return bicicletas.map((bicicleta) => BicicletaEntity.toDomain(bicicleta));

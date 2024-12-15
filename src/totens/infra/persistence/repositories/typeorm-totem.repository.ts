@@ -44,9 +44,6 @@ export class TypeormTotemRepository implements TotemRepository {
       where: { id: totemId },
       relations: ['bicicletas'],
     });
-    if (!totem) {
-      throw new Error('Totem não encontrado');
-    }
     return totem.bicicletas;
   }
 }
