@@ -46,7 +46,7 @@ export class TotemService {
   }
 
   async listarTrancas(totemId: number): Promise<Tranca[]> {
-    const totem = this.totemRepository.findById(totemId);
+    const totem = await this.totemRepository.findById(totemId);
     if (!totem) {
       throw new AppError(
         'Totem não encontrado',
@@ -58,7 +58,7 @@ export class TotemService {
   }
 
   async listarBicicletas(totemId: number): Promise<Bicicleta[]> {
-    const totem = this.totemRepository.findById(totemId);
+    const totem = await this.totemRepository.findById(totemId);
     if (!totem) {
       throw new AppError(
         'Totem não encontrado',
