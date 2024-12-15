@@ -3,13 +3,10 @@ import { TotemRepository } from './domain/totem.repository';
 import { Totem } from './domain/totem';
 import { CreateTotemDto } from './dto/create-totem.dto';
 import { TotemEntity } from './domain/totem.entity';
-<<<<<<< HEAD
 import { TrancaRepository } from 'src/trancas/domain/tranca.repository';
 import { TrancaEntity } from 'src/trancas/domain/tranca.entity';
 import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
 import { BicicletaEntity } from 'src/bicicletas/domain/bicicleta.entity';
-=======
->>>>>>> 0521ab8a6c993786e9ad8d6450388e4b96c2e4e2
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
 
 @Injectable()

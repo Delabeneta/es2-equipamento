@@ -7,12 +7,9 @@ import { TrancaEntity } from './domain/tranca.entity';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 import { TotemRepository } from 'src/totens/domain/totem.repository';
 import { generateRandomNumber } from 'src/common/utils/random-number';
-<<<<<<< HEAD
 import { TrancamentoTrancaDto } from './dto/tracamento-tranca.dto';
 import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
 import { BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
-=======
->>>>>>> 0521ab8a6c993786e9ad8d6450388e4b96c2e4e2
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
 
 @Injectable()
