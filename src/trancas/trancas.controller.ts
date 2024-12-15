@@ -12,6 +12,7 @@ import { TrancasService } from '../trancas/trancas.service';
 import { CreateTrancaDto } from '../trancas/dto/create-tranca.dto';
 import { UpdateTrancaDto } from '../trancas/dto/update-tranca.dto';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
+import { TrancamentoTrancaDto } from './dto/tracamento-tranca.dto';
 
 @Controller('/tranca')
 export class TrancasController {
@@ -43,5 +44,10 @@ export class TrancasController {
   @Post('/integrarNaRede')
   async inserirNoTotem(@Body() incluirTrancaDto: IncluirTrancaDto) {
     return this.trancasService.incluirNoTotem(incluirTrancaDto);
+  }
+
+  @Post('/destrancar')
+  async destrancar(@Body() tracamentoTrancaDto: TrancamentoTrancaDto) {
+    return this.trancasService.destrancar(tracamentoTrancaDto);
   }
 }

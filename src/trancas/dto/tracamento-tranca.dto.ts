@@ -1,10 +1,10 @@
 import { IsInt, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
-export class TrancarTrancaDto {
+export class TrancamentoTrancaDto {
   @IsNumber()
   @IsNotEmpty()
   idTranca: number;
   @IsInt()
   @IsOptional()
-  bicicletaId?: number;
+  idBicicleta?: number;
 }

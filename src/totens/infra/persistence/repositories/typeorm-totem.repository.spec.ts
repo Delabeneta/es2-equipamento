@@ -38,6 +38,7 @@ describe('TypeormTotemRepository', () => {
 
       expect(mockRepository.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
+        relations: ['trancas'],
       });
       expect(result).toEqual(totem);
     });

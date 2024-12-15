@@ -4,14 +4,14 @@ import { Tranca, TrancaStatus } from 'src/trancas/domain/tranca';
 
 export class TrancaEntity {
   id: number;
-  numero: number;
-  status: TrancaStatus;
-  modelo: string;
-  anoDeFabricacao: string;
   bicicleta: BicicletaEntity | null;
+  bicicletaId: number;
+  numero: number;
   totem: TotemEntity | null;
   totemId: number;
-  bicicletaId: number;
+  modelo: string;
+  anoDeFabricacao: string;
+  status: TrancaStatus;
   funcionarioId: number;
 
   static toDomain(trancaEntity: TrancaEntity) {

@@ -11,12 +11,18 @@ describe('TotemService', () => {
   let service: TotemService;
   let repository: TotemRepository;
 
+  const mockTrancaRepository = {
+    findById: jest.fn(),
+    // Adicione outros métodos necessários
+  };
+
   beforeEach(async () => {
     mockEntity = {
       id: 1,
       localizacao: 'Fragoso',
       descricao: 'Posto 24h',
       trancas: [],
+      bicicletas: [],
     };
 
     mockDomain = TotemEntity.toDomain(mockEntity);
@@ -26,6 +32,8 @@ describe('TotemService', () => {
       delete: jest.fn(),
       findAll: jest.fn(),
       findById: jest.fn(),
+      findTrancasByTotemId: jest.fn(),
+      findBicicletasByTotemId: jest.fn(),
     };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -33,6 +41,15 @@ describe('TotemService', () => {
         {
           provide: 'TotemRepository',
           useValue: repository,
+        },
+        TotemService,
+        {
+          provide: 'TrancaRepository',
+          useValue: mockTrancaRepository,
+        },
+        {
+          provide: 'BicicletaRepository',
+          useValue: jest.fn(),
         },
       ],
     }).compile();

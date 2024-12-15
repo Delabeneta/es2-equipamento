@@ -5,6 +5,7 @@ import { Tranca, TrancaStatus } from './domain/tranca';
 import { TrancaEntity } from './domain/tranca.entity';
 import { TotemRepository } from 'src/totens/domain/totem.repository';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
+import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
 
 describe('TrancaService', () => {
   let mockEntity: TrancaEntity;
@@ -14,6 +15,7 @@ describe('TrancaService', () => {
   let service: TrancasService;
   let trancaRepository: TrancaRepository;
   let totemRepository: TotemRepository;
+  let bicicletaRepository: BicicletaRepository;
 
   beforeEach(async () => {
     mockEntity = {
@@ -42,6 +44,16 @@ describe('TrancaService', () => {
       delete: jest.fn(),
       findAll: jest.fn(),
       findById: jest.fn(),
+      findTrancasByTotemId: jest.fn(),
+      findBicicletasByTotemId: jest.fn(),
+    };
+    bicicletaRepository = {
+      findById: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      findAll: jest.fn(),
+      delete: jest.fn(),
+      saveLogInsercao: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -55,6 +67,7 @@ describe('TrancaService', () => {
           provide: 'TotemRepository',
           useValue: totemRepository,
         },
+        { provide: 'BicicletaRepository', useValue: bicicletaRepository },
       ],
     }).compile();
 

@@ -7,6 +7,10 @@ import { TrancaEntity } from './domain/tranca.entity';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 import { TotemRepository } from 'src/totens/domain/totem.repository';
 import { generateRandomNumber } from 'src/common/utils/random-number';
+import { TrancamentoTrancaDto } from './dto/tracamento-tranca.dto';
+import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
+import { BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
+import { AppError, AppErrorType } from 'src/common/domain/app-error';
 
 @Injectable()
 export class TrancasService {
@@ -15,6 +19,8 @@ export class TrancasService {
     private readonly trancaRepository: TrancaRepository,
     @Inject('TotemRepository')
     private readonly totemRepository: TotemRepository,
+    @Inject('BicicletaRepository')
+    private readonly bicicletaRepository: BicicletaRepository,
   ) {}
 
   async delete(idTranca: number) {
@@ -46,7 +52,6 @@ export class TrancasService {
     return TrancaEntity.toDomain(updatedTranca);
   }
 
-  // criar uma tranca
   async create(createTrancaDto: CreateTrancaDto) {
     const trancaNumero = generateRandomNumber();
     const trancaStatus = TrancaStatus.NOVA;
@@ -89,6 +94,43 @@ export class TrancasService {
     await this.trancaRepository.update(idTranca, {
       status: TrancaStatus.LIVRE,
       totem: { id: idTotem },
+    });
+  }
+  async destrancar({ idTranca, idBicicleta }: TrancamentoTrancaDto) {
+    const tranca = await this.trancaRepository.findById(idTranca);
+
+    if (!tranca) {
+      throw new AppError(
+        'Tranca não encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
+    }
+
+    // Valida se a tranca está ocupada
+    if (tranca.status !== TrancaStatus.OCUPADA) {
+      throw new Error('A tranca não está ocupada e não pode ser destrancada.');
+    }
+    // Caso receba um ID de bicicleta
+    if (idBicicleta) {
+      const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
+
+      if (!bicicleta) {
+        throw new Error('Bicicleta não encontrada');
+      }
+
+      if (bicicleta.trancaId !== tranca.id) {
+        throw new Error('A bicicleta não está associada a esta tranca.');
+      }
+
+      // Atualiza o status da bicicleta
+      await this.bicicletaRepository.update(idBicicleta, {
+        status: BicicletaStatus.DISPONIVEL,
+      });
+    }
+
+    await this.trancaRepository.update(idTranca, {
+      status: TrancaStatus.LIVRE,
+      bicicleta: null,
     });
   }
 }

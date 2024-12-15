@@ -12,9 +12,9 @@ export class Tranca {
   bicicleta: number;
   numero: number;
   localizacao: string;
-  status: TrancaStatus;
   modelo: string;
   anoDeFabricacao: string;
+  status: TrancaStatus;
 }
 
 export class TrancaPersistence extends Tranca {

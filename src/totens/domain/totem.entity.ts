@@ -1,3 +1,4 @@
+import { BicicletaEntity } from 'src/bicicletas/domain/bicicleta.entity';
 import { Totem } from 'src/totens/domain/totem';
 import { TrancaEntity } from 'src/trancas/domain/tranca.entity';
 
@@ -6,6 +7,7 @@ export class TotemEntity {
   localizacao: string;
   descricao: string;
   trancas: TrancaEntity[];
+  bicicletas: BicicletaEntity[];
 
   static toDomain(totemEntity: TotemEntity) {
     if (!totemEntity) return null;

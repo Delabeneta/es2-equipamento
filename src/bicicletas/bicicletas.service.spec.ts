@@ -32,6 +32,7 @@ describe('BicicletasService', () => {
       update: jest.fn(),
     };
 
+    // configurar ambiente de teste
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BicicletasService,

@@ -3,7 +3,7 @@
 ### BICICLETAS
 
 # Obter todas as bicicletas
-GET {{baseurl}}/bicicleta/1
+GET {{baseurl}}/bicicleta/
 ###
 
 # Atualizar dados de uma bicicleta
@@ -18,12 +18,12 @@ Content-Type: application/json
 ###
 
 # Criar uma nova bicicleta
-POST {{baseurl}}/bicicleta/1/
+POST {{baseurl}}/bicicleta
 Content-Type: application/json
 
 {   
     "ano": "2000",
-    "modelo": "Tarmac",
+    "modelo": "Delabeneta",
     "marca": "marca_a"
 }
 ###
@@ -45,7 +45,7 @@ Content-Type: application/json
 
 ### mudar status
 
-POST {{baseurl}}/bicicleta/1/status/APOSENTAR/
+POST {{baseurl}}/bicicleta/2/status/APOSENTAR/
 
 
 
@@ -85,6 +85,22 @@ Content-Type: application/json
     "idFuncionario": 0,
     "idTotem": 1
 }
+
+###
+
+GET {{baseurl}}/totem/1/trancas
+###
+
+GET {{baseurl}}/tranca
+###
+POST {{baseurl}}/tranca/destrancar
+Content-Type: application/json
+
+{
+    "idTranca": 1,
+    "idBicicleta": 1
+}
+
 ###
 
 # Criar uma nova tranca
@@ -104,7 +120,7 @@ DELETE {{baseurl}}/tranca/1/
 ### TOTEM
 
 # Obter todos os totens
-GET {{baseurl}}/totem/
+GET {{baseurl}}/totem/1/trancas
 ###
 
 # Atualizar dados de um totem
@@ -121,11 +137,11 @@ POST {{baseurl}}/totem/
 Content-Type: application/json
 
 {   
-    "localizacao": "Urca",
-    "descricao": "Unirio 458"
+    "localizacao": "Botafogo",
+    "descricao": "Praia Shopping"
 }
 ###
 
 # Excluir um totem
-DELETE {{baseurl}}/totem/2/
+DELETE {{baseurl}}/totem/1
 ###
