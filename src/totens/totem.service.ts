@@ -33,7 +33,7 @@ export class TotemService {
       );
     }
     // !(trancas[] == 0) = Há valores dentro do objetos.
-    if (totemExistente.trancas.length > 1) {
+    if (totemExistente.trancas.length > 0) {
       throw new AppError('Totem com trancas', AppErrorType.RESOURCE_CONFLICT);
     }
 

@@ -13,6 +13,8 @@ import { CreateTrancaDto } from '../trancas/dto/create-tranca.dto';
 import { UpdateTrancaDto } from '../trancas/dto/update-tranca.dto';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 import { TrancamentoTrancaDto } from './dto/tracamento-tranca.dto';
+import { Tranca } from './domain/tranca';
+import { RetirarTrancaDto } from './dto/retirar-tranca.dto';
 
 @Controller('/tranca')
 export class TrancasController {
@@ -36,6 +38,11 @@ export class TrancasController {
     return this.trancasService.findAll();
   }
 
+  @Get(':idTranca')
+  async findById(@Param('idTranca') idTranca: number): Promise<Tranca> {
+    return await this.trancasService.findById(idTranca);
+  }
+
   @Delete(':idTranca')
   async delete(@Param('idTranca') idTranca: number) {
     return this.trancasService.delete(idTranca);
@@ -46,8 +53,17 @@ export class TrancasController {
     return this.trancasService.incluirNoTotem(incluirTrancaDto);
   }
 
+  @Post('/retirarNaRede')
+  async retirarDaRede(@Body() retirarTrancaDto: RetirarTrancaDto) {
+    return this.trancasService.retirarDoTotem(retirarTrancaDto);
+  }
+
   @Post('/destrancar')
   async destrancar(@Body() tracamentoTrancaDto: TrancamentoTrancaDto) {
     return this.trancasService.destrancar(tracamentoTrancaDto);
+  }
+  @Post('/trancar')
+  async trancar(@Body() tracamentoTrancaDto: TrancamentoTrancaDto) {
+    return this.trancasService.trancar(tracamentoTrancaDto);
   }
 }

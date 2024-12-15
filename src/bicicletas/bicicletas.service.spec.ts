@@ -330,7 +330,7 @@ describe('BicicletasService', () => {
 
       await expect(
         bicicletasService.changeStatus(1, 'APOSENTAR'),
-      ).rejects.toThrow('Bicicleta não encontrada');
+      ).rejects.toThrow('Bicicleta nao encontrada');
     });
 
     it('should throw an error when the action is invalid', async () => {

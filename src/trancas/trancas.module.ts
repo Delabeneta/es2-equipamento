@@ -8,10 +8,12 @@ import { TypeormTotemRepository } from 'src/totens/infra/persistence/repositorie
 import { TypeormTotemEntity } from 'src/totens/infra/persistence/entities/typeorm-totem.entity';
 import { TypeormBicicletaRepository } from 'src/bicicletas/infra/persistence/repositories/typeorm-bicicleta.repository';
 import { TypeormBicicletaEntity } from 'src/bicicletas/infra/persistence/entities/typeorm-bicicleta.entity';
+import { EmailService } from 'src/common/utils/email.service';
 
 @Module({
   controllers: [TrancasController],
   providers: [
+    EmailService,
     TrancasService,
     {
       provide: 'TrancaRepository',

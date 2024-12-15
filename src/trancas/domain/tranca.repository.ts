@@ -23,4 +23,11 @@ export interface TrancaRepository {
   create(tranca: CreateTranca): Promise<TrancaEntity>;
   update(idTranca: number, data: UpdateTranca): Promise<TrancaEntity>;
   delete(idTranca: number): Promise<void>;
+  saveLogInsercao(
+    idTranca: number,
+    LogInsercao: {
+      dataHoraInsercao: string;
+      idTranca: number;
+    },
+  ): Promise<void>;
 }

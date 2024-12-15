@@ -6,6 +6,11 @@ import { TrancaEntity } from './domain/tranca.entity';
 import { TotemRepository } from 'src/totens/domain/totem.repository';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
+import { EmailService } from 'src/common/utils/email.service';
+
+const mockEmailService = {
+  sendEmail: jest.fn(),
+};
 
 describe('TrancaService', () => {
   let mockEntity: TrancaEntity;
@@ -29,6 +34,7 @@ describe('TrancaService', () => {
       totemId: 0,
       bicicletaId: 0,
       funcionarioId: 0,
+      logsInsercao: null,
     };
     mockDomain = TrancaEntity.toDomain(mockEntity);
     mockTotem = { id: 1, nome: 'Totem 1' };
@@ -38,6 +44,7 @@ describe('TrancaService', () => {
       delete: jest.fn(),
       findAll: jest.fn(),
       findById: jest.fn(),
+      saveLogInsercao: jest.fn(),
     };
     totemRepository = {
       create: jest.fn(),
@@ -68,6 +75,7 @@ describe('TrancaService', () => {
           useValue: totemRepository,
         },
         { provide: 'BicicletaRepository', useValue: bicicletaRepository },
+        { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
 

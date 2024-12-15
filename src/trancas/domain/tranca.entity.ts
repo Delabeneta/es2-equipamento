@@ -13,6 +13,7 @@ export class TrancaEntity {
   anoDeFabricacao: string;
   status: TrancaStatus;
   funcionarioId: number;
+  logsInsercao: any;
 
   static toDomain(trancaEntity: TrancaEntity) {
     if (!trancaEntity) return null;

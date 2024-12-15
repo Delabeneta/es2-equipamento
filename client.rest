@@ -29,7 +29,7 @@ Content-Type: application/json
 ###
 
 # Excluir uma bicicleta
-DELETE {{baseurl}}/bicicleta/2/
+DELETE {{baseurl}}/bicicleta/3/
 ###
 
 # Integrar bicicleta na rede
@@ -37,7 +37,7 @@ POST {{baseurl}}/bicicleta/integrarNaRede/
 Content-Type: application/json
 
 {
-   "idBicicleta": 2,
+   "idBicicleta": 1,
    "idTranca": 1,
    "idFuncionario": 0
 }
@@ -45,7 +45,7 @@ Content-Type: application/json
 
 ### mudar status
 
-POST {{baseurl}}/bicicleta/2/status/APOSENTAR/
+POST {{baseurl}}/bicicleta/3/status/REPARO_SOLICITADO/
 
 
 
@@ -55,9 +55,9 @@ POST {{baseurl}}/bicicleta/retirarDaRede/
 Content-Type: application/json
 
 {
-   "idBicicleta": 1,
+   "idBicicleta": 3,
    "idTranca": 1,
-   "idFuncionario": 0,
+   "idFuncionario": 1,
    "opcao": "REPARO"
 }
 
@@ -98,7 +98,7 @@ Content-Type: application/json
 
 {
     "idTranca": 1,
-    "idBicicleta": 2
+    "idBicicleta": 1
 }
 
 ###

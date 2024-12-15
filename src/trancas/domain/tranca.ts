@@ -5,6 +5,7 @@ export enum TrancaStatus {
   EM_REPARO = 'EM_REPARO',
   APOSENTADA = 'APOSENTADA',
   EXCLUIDA = 'EXCLUIDA',
+  REPARO_SOLICITADO = 'REPARO_SOLICITADO',
 }
 
 export class Tranca {
@@ -15,6 +16,7 @@ export class Tranca {
   modelo: string;
   anoDeFabricacao: string;
   status: TrancaStatus;
+  funcionarioId?: number;
 }
 
 export class TrancaPersistence extends Tranca {

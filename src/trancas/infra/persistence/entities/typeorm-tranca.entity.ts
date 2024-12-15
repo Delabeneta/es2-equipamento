@@ -36,4 +36,6 @@ export class TypeormTrancaEntity {
   bicicletaId: number;
   @Column({ nullable: true })
   funcionarioId: number;
+  @Column('text', { nullable: true })
+  logsInsercao: string;
 }
