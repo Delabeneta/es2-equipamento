@@ -11,7 +11,7 @@ import { TrancamentoTrancaDto } from './dto/tracamento-tranca.dto';
 import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
 import { BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
-import { RetirarTrancaDto } from './dto/retirar-tranca.dto';
+import { Opcao, RetirarTrancaDto } from './dto/retirar-tranca.dto';
 import { EmailService } from 'src/common/utils/email.service';
 
 @Injectable()
@@ -40,6 +40,23 @@ export class TrancasService {
       anoDeFabricacao: createTrancaDto.anoDeFabricacao,
     });
     return TrancaEntity.toDomain(createdTranca);
+  }
+  async delete(idTranca: number) {
+    const trancaExistente = await this.trancaRepository.findById(idTranca);
+    if (!trancaExistente) {
+      throw new AppError(
+        'Tranca não encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
+    }
+
+    if (trancaExistente.status === TrancaStatus.OCUPADA) {
+      throw new AppError(
+        'Apenas Trancas sem bicicletas podem ser excluídas',
+        AppErrorType.RESOURCE_CONFLICT,
+      );
+    }
+    return this.trancaRepository.delete(idTranca);
   }
 
   async findAll(): Promise<Tranca[]> {
@@ -71,24 +88,6 @@ export class TrancasService {
       updateTrancaDto,
     );
     return TrancaEntity.toDomain(updatedTranca);
-  }
-
-  async delete(idTranca: number) {
-    const trancaExistente = await this.trancaRepository.findById(idTranca);
-    if (!trancaExistente) {
-      throw new AppError(
-        'Tranca não encontrada',
-        AppErrorType.RESOURCE_NOT_FOUND,
-      );
-    }
-
-    if (trancaExistente.status === TrancaStatus.OCUPADA) {
-      throw new AppError(
-        'Apenas Trancas sem bicicletas podem ser excluídas',
-        AppErrorType.RESOURCE_CONFLICT,
-      );
-    }
-    return this.trancaRepository.delete(idTranca);
   }
 
   // ========================
@@ -134,37 +133,43 @@ export class TrancasService {
     }
     tranca.funcionarioId = idFuncionario;
 
+    if (opcao === Opcao.EM_REPARO) {
+      await this.trancaRepository.update(idTranca, {
+        status: TrancaStatus.EM_REPARO,
+      });
+    } else if (opcao === Opcao.APOSENTADORIA) {
+      await this.trancaRepository.update(idTranca, {
+        status: TrancaStatus.APOSENTADA,
+      });
+    } else {
+      throw new AppError(
+        'Opcao invalida para retirada da tranca',
+        AppErrorType.RESOURCE_CONFLICT,
+      );
+    }
+
     await this.trancaRepository.update(idTranca, {
       status: TrancaStatus.LIVRE,
       totem: null,
     });
 
-    if (opcao == 'REPARO') {
-      await this.trancaRepository.update(idTranca, {
-        status: TrancaStatus.EM_REPARO,
-      });
-    } else if (opcao == 'APOSENTADORIA') {
-      await this.trancaRepository.update(idTranca, {
-        status: TrancaStatus.APOSENTADA,
-      });
-      const dataHoraRetirada = new Date().toISOString();
+    const dataHoraRetirada = new Date().toISOString();
 
-      const logInsercao = {
-        dataHoraInsercao: new Date().toISOString(),
-        idTranca,
-        idFuncionario,
-      };
-      await this.trancaRepository.saveLogInsercao(idTranca, logInsercao);
+    const logInsercao = {
+      dataHoraInsercao: new Date().toISOString(),
+      idTranca,
+      idFuncionario,
+    };
+    await this.trancaRepository.saveLogInsercao(idTranca, logInsercao);
 
-      const emailResponse = await this.emailService.sendEmail(
-        'supervisor@equipamento.com',
-        'Retirada de Tranca',
-        `A tranca de número ${idTranca} foi retirada para ${opcao}.
+    const emailResponse = await this.emailService.sendEmail(
+      'supervisor@equipamento.com',
+      'Retirada de Tranca',
+      `A tranca de número ${idTranca} foi retirada para ${opcao}.
     Data/Hora: ${dataHoraRetirada}
     Funcionario: ${idFuncionario}`,
-      );
-      return `Resposta do envio de e-mail:' ${emailResponse}`;
-    }
+    );
+    return `Resposta do envio de e-mail:' ${emailResponse}`;
   }
   async trancar({ idTranca, idBicicleta }: TrancamentoTrancaDto) {
     const tranca = await this.validarTranca(idTranca);

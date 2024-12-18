@@ -12,8 +12,8 @@ export class Tranca {
   id: number;
   bicicleta: number;
   numero: number;
-  localizacao: string;
   modelo: string;
+  localizacao: string;
   anoDeFabricacao: string;
   status: TrancaStatus;
   funcionarioId?: number;

@@ -36,7 +36,7 @@ export class TotemService {
     const totemExistente = await this.totemRepository.findById(idTotem);
     if (!totemExistente) {
       throw new AppError(
-        'Totem nao encontrada',
+        'Totem nao encontrado',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
@@ -61,7 +61,7 @@ export class TotemService {
     const totem = await this.totemRepository.findById(totemId);
     if (!totem) {
       throw new AppError(
-        'Totem não encontrado',
+        'Totem nao encontrado',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
@@ -85,14 +85,14 @@ export class TotemService {
     const totem = await this.totemRepository.findById(totemId);
     if (!totem) {
       throw new AppError(
-        'Totem não encontrado',
+        'Totem nao encontrado',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
 
     // Busca as bicicletas associadas ao totem
     const bicicletas =
-      await this.totemRepository.findBicicletasByTotemId(totemId);
+      (await this.totemRepository.findBicicletasByTotemId(totemId)) || [];
 
     // Se não houver bicicletas, lançar erro ou retornar uma resposta vazia
     if (bicicletas.length === 0) {

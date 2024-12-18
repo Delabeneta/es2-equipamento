@@ -86,7 +86,7 @@ export class BicicletasService {
     idFuncionario,
   }: IncludeBicicletaOnTrancaDto) {
     const bicicleta = await this.validarBicicleta(idBicicleta);
-    await this.verificarStatusBicicletaParaInclusao(bicicleta, idFuncionario);
+    this.verificarStatusBicicletaParaInclusao(bicicleta, idFuncionario);
 
     const tranca = await this.validarTranca(idTranca);
 
