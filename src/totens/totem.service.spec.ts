@@ -3,6 +3,7 @@ import { TotemRepository } from './domain/totem.repository';
 import { TotemService } from './totem.service';
 import { Totem } from './domain/totem';
 import { TotemEntity } from './domain/totem.entity';
+import { AppError, AppErrorType } from 'src/common/domain/app-error';
 
 describe('TotemService', () => {
   let mockEntity: TotemEntity;
@@ -73,11 +74,10 @@ describe('TotemService', () => {
     await expect(service.delete(mockEntity.id)).resolves.toBeUndefined();
     expect(repository.findById).toHaveBeenCalled();
   });
-
   it('should not delete when totem not found', async () => {
     jest.spyOn(repository, 'findById').mockResolvedValue(null);
     await expect(service.delete(mockEntity.id)).rejects.toThrow(
-      'Totem não encontrada',
+      'Totem nao encontrada',
     );
     expect(repository.findById).toHaveBeenCalled();
   });
@@ -86,5 +86,29 @@ describe('TotemService', () => {
     jest.spyOn(repository, 'findAll').mockResolvedValue([mockEntity]);
     await expect(service.findAll()).resolves.toStrictEqual([mockDomain]);
     expect(repository.findAll).toHaveBeenCalled();
+  });
+  // listar trancas:
+  it('should throw an error if no trancas are found', async () => {
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockEntity);
+    jest.spyOn(repository, 'findTrancasByTotemId').mockResolvedValue([]); // Nenhuma tranca encontrada
+
+    await expect(service.listarTrancas(mockEntity.id)).rejects.toThrowError(
+      new AppError(
+        'Nenhuma tranca encontrada para este totem',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      ),
+    );
+  });
+  // listar bicicletas
+  it('should throw an error if no bicicletas are found', async () => {
+    jest.spyOn(repository, 'findById').mockResolvedValue(mockEntity);
+    jest.spyOn(repository, 'findBicicletasByTotemId').mockResolvedValue([]); // Nenhuma bicicleta encontrada
+
+    await expect(service.listarBicicletas(mockEntity.id)).rejects.toThrowError(
+      new AppError(
+        'Nenhuma bicicleta encontrada para este totem',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      ),
+    );
   });
 });

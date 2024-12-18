@@ -7,6 +7,7 @@ import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
 import { BicicletaEntity } from './domain/bicicleta.entity';
 import { TrancaStatus } from 'src/trancas/domain/tranca';
 import { EmailService } from 'src/common/utils/email.service';
+import { AppError, AppErrorType } from 'src/common/domain/app-error';
 
 const mockEmailService = {
   sendEmail: jest.fn(), // Simula o método sendEmail
@@ -44,6 +45,10 @@ describe('BicicletasService', () => {
 
     bicicletasService = module.get<BicicletasService>(BicicletasService);
   });
+
+  // **************************
+  ///   TESTES_MÉTODOS_CRUD
+  // **************************
 
   describe('create', () => {
     it('should create a new bicicleta', async () => {
@@ -147,7 +152,6 @@ describe('BicicletasService', () => {
       expect(result).toHaveProperty('marca', updated.marca);
     });
   });
-
   describe('findAll', () => {
     it('should return all bicicletas', async () => {
       const bicicleta = {
@@ -169,6 +173,41 @@ describe('BicicletasService', () => {
       expect(result).toStrictEqual([bicicletaDomain]);
     });
   });
+  describe('findById', () => {
+    it('should return the bicicleta if it exists', async () => {
+      const bicicleta = {
+        id: 1,
+        ano: '2022',
+        marca: 'caloi',
+        modelo: 'bmx',
+        status: BicicletaStatus.NOVA,
+        funcionarioId: 0,
+        trancaId: 0,
+      } as BicicletaEntity;
+
+      bicicletaRepository.findById = jest.fn().mockResolvedValue(bicicleta);
+
+      const bicicletaDomain = BicicletaEntity.toDomain(bicicleta);
+      const result = await bicicletasService.findById(1);
+
+      expect(bicicletaRepository.findById).toHaveBeenCalledWith(1);
+      expect(result).toStrictEqual(bicicletaDomain);
+    });
+    it('should not return bicicleta if it not exists', () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue(null);
+
+      expect(bicicletasService.findById(1)).rejects.toThrow(
+        new AppError(
+          'Bicicleta nao encontrada',
+          AppErrorType.RESOURCE_NOT_FOUND,
+        ),
+      );
+    });
+  });
+
+  // ****************************
+  /// TESTES_MÉTODOS_DE_NEGÓCIO
+  // ****************************
 
   describe('incluirBicicletaNaRede', () => {
     it('should include bicicleta in the network if valid', async () => {
@@ -207,7 +246,10 @@ describe('BicicletasService', () => {
           idFuncionario: 123,
         }),
       ).rejects.toThrow(
-        'Bicicleta está com status inválido para inserir no totem',
+        new AppError(
+          'Bicicleta está com status inválido para inserir no totem',
+          AppErrorType.RESOURCE_CONFLICT,
+        ),
       );
     });
 
@@ -223,7 +265,7 @@ describe('BicicletasService', () => {
           idTranca: 1,
           idFuncionario: 123,
         }),
-      ).rejects.toThrow('Funcionário não é o mesmo que a retirou');
+      ).rejects.toThrow('Funcionário nao é o mesmo que a retirou');
     });
 
     it('should throw an error if bicicleta is not found', async () => {
@@ -235,7 +277,12 @@ describe('BicicletasService', () => {
           idTranca: 1,
           idFuncionario: 123,
         }),
-      ).rejects.toThrow('Bicicleta nao encontrada');
+      ).rejects.toThrow(
+        new AppError(
+          'Bicicleta nao encontrada',
+          AppErrorType.RESOURCE_NOT_FOUND,
+        ),
+      );
     });
 
     it('should throw an error if tranca is not found', async () => {
@@ -250,7 +297,7 @@ describe('BicicletasService', () => {
           idTranca: 1,
           idFuncionario: 123,
         }),
-      ).rejects.toThrow('Tranca não encontrada');
+      ).rejects.toThrow('Tranca nao encontrada');
     });
 
     it('should throw an error if tranca is not available', async () => {
@@ -268,12 +315,196 @@ describe('BicicletasService', () => {
           idTranca: 1,
           idFuncionario: 123,
         }),
-      ).rejects.toThrow('Tranca não está disponível');
+      ).rejects.toThrow('Tranca nao está disponível');
     });
   });
 
-  /// funcao para registrar
-  // teste de sucesso para envio de registro - unico possível
+  /// funcao para retirar bicicleta da Rede
+
+  describe('retirarBicicletaDaRede', () => {
+    it('should retirar bicicleta from the network if valid and opcao = Reparo', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue({
+        id: 1,
+        status: BicicletaStatus.REPARO_SOLICITADO,
+      });
+
+      trancaRepository.findById = jest.fn().mockResolvedValue({
+        id: 2,
+        status: TrancaStatus.OCUPADA,
+        bicicletaId: 1,
+      });
+
+      await bicicletasService.retirarBicicletaDaRede({
+        idBicicleta: 1,
+        idTranca: 2,
+        idFuncionario: 123,
+        opcao: 'REPARO',
+      });
+
+      expect(trancaRepository.update).toHaveBeenCalledWith(2, {
+        status: TrancaStatus.LIVRE,
+        bicicleta: null,
+      });
+      expect(bicicletaRepository.update).toHaveBeenCalledWith(1, {
+        funcionarioId: 123,
+        status: BicicletaStatus.EM_REPARO,
+      });
+      expect(bicicletaRepository.saveLogInsercao).toHaveBeenCalledWith(1, {
+        dataHoraInsercao: expect.any(String),
+        idTranca: 2,
+      });
+      expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
+        'reparador@equipamento.com',
+        'Retirada de Bicicleta',
+        expect.stringContaining(
+          'A bicicleta de número 1 foi retirada para REPARO.',
+        ),
+      );
+    });
+    it('should retirar bicicleta from the network if valid and opcao = APOSENTADORIA', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue({
+        id: 1,
+        status: BicicletaStatus.REPARO_SOLICITADO,
+      });
+
+      trancaRepository.findById = jest.fn().mockResolvedValue({
+        id: 2,
+        status: TrancaStatus.OCUPADA,
+        bicicletaId: 1,
+      });
+
+      await bicicletasService.retirarBicicletaDaRede({
+        idBicicleta: 1,
+        idTranca: 2,
+        idFuncionario: 123,
+        opcao: 'APOSENTADORIA',
+      });
+
+      expect(trancaRepository.update).toHaveBeenCalledWith(2, {
+        status: TrancaStatus.LIVRE,
+        bicicleta: null,
+      });
+      expect(bicicletaRepository.update).toHaveBeenCalledWith(1, {
+        funcionarioId: 123,
+        status: BicicletaStatus.APOSENTADA,
+      });
+      expect(bicicletaRepository.saveLogInsercao).toHaveBeenCalledWith(1, {
+        dataHoraInsercao: expect.any(String),
+        idTranca: 2,
+      });
+      expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
+        'reparador@equipamento.com',
+        'Retirada de Bicicleta',
+        expect.stringContaining(
+          'A bicicleta de número 1 foi retirada para APOSENTADORIA.',
+        ),
+      );
+    });
+    it('should retirar bicicleta from the network if valid and opcao = APOSENTADORIA', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue({
+        id: 1,
+        status: BicicletaStatus.REPARO_SOLICITADO,
+      });
+
+      trancaRepository.findById = jest.fn().mockResolvedValue({
+        id: 2,
+        status: TrancaStatus.OCUPADA,
+        bicicletaId: 1,
+      });
+
+      await bicicletasService.retirarBicicletaDaRede({
+        idBicicleta: 1,
+        idTranca: 2,
+        idFuncionario: 123,
+        opcao: 'APOSENTADORIA',
+      });
+
+      expect(trancaRepository.update).toHaveBeenCalledWith(2, {
+        status: TrancaStatus.LIVRE,
+        bicicleta: null,
+      });
+      expect(bicicletaRepository.update).toHaveBeenCalledWith(1, {
+        funcionarioId: 123,
+        status: BicicletaStatus.APOSENTADA,
+      });
+      expect(bicicletaRepository.saveLogInsercao).toHaveBeenCalledWith(1, {
+        dataHoraInsercao: expect.any(String),
+        idTranca: 2,
+      });
+      expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
+        'reparador@equipamento.com',
+        'Retirada de Bicicleta',
+        expect.stringContaining(
+          'A bicicleta de número 1 foi retirada para APOSENTADORIA.',
+        ),
+      );
+    });
+    it('should throw an error if opcao is invalid', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue({
+        id: 1,
+        status: BicicletaStatus.REPARO_SOLICITADO,
+      });
+
+      trancaRepository.findById = jest.fn().mockResolvedValue({
+        id: 2,
+        status: TrancaStatus.OCUPADA,
+        bicicletaId: 1,
+      });
+
+      // Simula a chamada ao método com uma opção inválida
+      await expect(
+        bicicletasService.retirarBicicletaDaRede({
+          idBicicleta: 1,
+          idTranca: 2,
+          idFuncionario: 123,
+          opcao: 'teste', // Valor inválido
+        }),
+      ).rejects.toThrow(
+        new AppError(
+          'Opçao inválida para retirada da bicicleta',
+          AppErrorType.RESOURCE_CONFLICT,
+        ),
+      );
+    });
+
+    it('should throw an error if bicicleta is not found', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue(null);
+
+      await expect(
+        bicicletasService.retirarBicicletaDaRede({
+          idBicicleta: 1,
+          idTranca: 2,
+          idFuncionario: 123,
+          opcao: 'REPARO',
+        }),
+      ).rejects.toThrow(
+        new AppError(
+          'Bicicleta nao encontrada',
+          AppErrorType.RESOURCE_NOT_FOUND,
+        ),
+      );
+    });
+
+    it('should throw an error if tranca is not found', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue({
+        id: 1,
+        status: BicicletaStatus.REPARO_SOLICITADO,
+      });
+
+      trancaRepository.findById = jest.fn().mockResolvedValue(null);
+
+      await expect(
+        bicicletasService.retirarBicicletaDaRede({
+          idBicicleta: 1,
+          idTranca: 2,
+          idFuncionario: 123,
+          opcao: 'REPARO',
+        }),
+      ).rejects.toThrow(
+        new AppError('Tranca nao encontrada', AppErrorType.RESOURCE_NOT_FOUND),
+      );
+    });
+  });
 
   /// mudança de status
   describe('changeStatus', () => {
@@ -330,7 +561,12 @@ describe('BicicletasService', () => {
 
       await expect(
         bicicletasService.changeStatus(1, 'APOSENTAR'),
-      ).rejects.toThrow('Bicicleta nao encontrada');
+      ).rejects.toThrow(
+        new AppError(
+          'Bicicleta nao encontrada',
+          AppErrorType.RESOURCE_NOT_FOUND,
+        ),
+      );
     });
 
     it('should throw an error when the action is invalid', async () => {

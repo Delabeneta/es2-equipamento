@@ -22,6 +22,22 @@ export class BicicletasService {
     private readonly emailService: EmailService,
   ) {}
 
+  // *********************
+  ///    MÉTODOS CRUD
+  // *********************
+
+  async create(createBicicletaDto: CreateBicicletaDto) {
+    const bicicletaNumero = generateRandomNumber();
+    const bicicletaStatus = BicicletaStatus.NOVA;
+
+    const createdBicicleta = await this.bicicletaRepository.create({
+      ...createBicicletaDto,
+      status: bicicletaStatus,
+      numero: bicicletaNumero,
+    });
+
+    return BicicletaEntity.toDomain(createdBicicleta);
+  }
   async delete(idBicicleta: number) {
     const bicicleta = await this.validarBicicleta(idBicicleta);
 
@@ -35,22 +51,6 @@ export class BicicletasService {
     return this.bicicletaRepository.delete(idBicicleta);
   }
 
-  async findById(id: number) {
-    const bicicletaEntity = await this.bicicletaRepository.findById(id);
-    if (!bicicletaEntity) {
-      throw new AppError(
-        'Bicicleta nao encontrada',
-        AppErrorType.RESOURCE_NOT_FOUND,
-      );
-    }
-    return BicicletaEntity.toDomain(bicicletaEntity);
-  }
-
-  async findAll() {
-    const bicicletas = await this.bicicletaRepository.findAll();
-    return bicicletas.map((bicicleta) => BicicletaEntity.toDomain(bicicleta));
-  }
-
   async update(idBicicleta: number, updateBicicletaDto: UpdateBicicletaDto) {
     await this.validarBicicleta(idBicicleta);
 
@@ -61,18 +61,19 @@ export class BicicletasService {
 
     return BicicletaEntity.toDomain(updatedBicicleta);
   }
-
-  async create(createBicicletaDto: CreateBicicletaDto) {
-    const bicicletaNumero = generateRandomNumber();
-    const bicicletaStatus = BicicletaStatus.NOVA;
-
-    const createdBicicleta = await this.bicicletaRepository.create({
-      ...createBicicletaDto,
-      status: bicicletaStatus,
-      numero: bicicletaNumero,
-    });
-
-    return BicicletaEntity.toDomain(createdBicicleta);
+  async findAll() {
+    const bicicletas = await this.bicicletaRepository.findAll();
+    return bicicletas.map((bicicleta) => BicicletaEntity.toDomain(bicicleta));
+  }
+  async findById(id: number) {
+    const bicicletaEntity = await this.bicicletaRepository.findById(id);
+    if (!bicicletaEntity) {
+      throw new AppError(
+        'Bicicleta nao encontrada',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
+    }
+    return BicicletaEntity.toDomain(bicicletaEntity);
   }
 
   // *********************
@@ -91,7 +92,7 @@ export class BicicletasService {
 
     if (tranca.status !== TrancaStatus.LIVRE) {
       throw new AppError(
-        'Tranca não está disponível',
+        'Tranca nao está disponível',
         AppErrorType.RESOURCE_CONFLICT,
       );
     }
@@ -165,7 +166,8 @@ export class BicicletasService {
     return this.emailService.sendEmail(
       'reparador@equipamento.com',
       'Retirada de Bicicleta',
-      `A bicicleta de número ${idBicicleta} foi retirada para ${opcao}.\nData/Hora: ${dataHoraRetirada}\nReparador: ${idFuncionario}`,
+      `A bicicleta de número ${idBicicleta} foi retirada para ${opcao}.
+      Data/Hora: ${dataHoraRetirada}`,
     );
   }
 
@@ -196,7 +198,7 @@ export class BicicletasService {
     const tranca = await this.trancaRepository.findById(idTranca);
     if (!tranca) {
       throw new AppError(
-        'Tranca não encontrada',
+        'Tranca nao encontrada',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
@@ -222,7 +224,7 @@ export class BicicletasService {
       bicicleta.funcionarioId !== idFuncionario
     ) {
       throw new AppError(
-        'Funcionário não é o mesmo que a retirou',
+        'Funcionário nao é o mesmo que a retirou',
         AppErrorType.RESOURCE_CONFLICT,
       );
     }
@@ -242,7 +244,7 @@ export class BicicletasService {
 
     if (!acaoDoRepador) {
       throw new AppError(
-        'Opção inválida para status da bicicleta',
+        'Opçao inválida para retirada da bicicleta',
         AppErrorType.RESOURCE_CONFLICT,
       );
     }

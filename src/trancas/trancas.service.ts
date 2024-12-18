@@ -160,7 +160,8 @@ export class TrancasService {
         'supervisor@equipamento.com',
         'Retirada de Tranca',
         `A tranca de número ${idTranca} foi retirada para ${opcao}.
-    Data/Hora: ${dataHoraRetirada}\nFuncionario: ${idFuncionario}`,
+    Data/Hora: ${dataHoraRetirada}
+    Funcionario: ${idFuncionario}`,
       );
       return `Resposta do envio de e-mail:' ${emailResponse}`;
     }

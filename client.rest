@@ -37,7 +37,7 @@ POST {{baseurl}}/bicicleta/integrarNaRede/
 Content-Type: application/json
 
 {
-   "idBicicleta": 1,
+   "idBicicleta": 2,
    "idTranca": 1,
    "idFuncionario": 0
 }

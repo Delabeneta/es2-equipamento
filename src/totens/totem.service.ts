@@ -24,11 +24,19 @@ export class TotemService {
     private readonly bicicletaRepository: BicicletaRepository,
   ) {}
 
+  async create(createTotemDto: CreateTotemDto) {
+    const createdTotem = await this.totemRepository.create({
+      descricao: createTotemDto.descricao,
+      localizacao: createTotemDto.localizacao,
+    });
+    return TotemEntity.toDomain(createdTotem);
+  }
+
   async delete(idTotem: number) {
     const totemExistente = await this.totemRepository.findById(idTotem);
     if (!totemExistente) {
       throw new AppError(
-        'Totem não encontrada',
+        'Totem nao encontrada',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
@@ -44,8 +52,12 @@ export class TotemService {
     const totens = await this.totemRepository.findAll();
     return totens.map((totem) => TotemEntity.toDomain(totem));
   }
+  // *********************
+  /// MÉTODOS DE NEGÓCIO
+  // *********************
 
   async listarTrancas(totemId: number): Promise<Tranca[]> {
+    // Verifica se o totem existe
     const totem = await this.totemRepository.findById(totemId);
     if (!totem) {
       throw new AppError(
@@ -53,11 +65,23 @@ export class TotemService {
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
+
+    // Busca as trancas associadas ao totem
     const trancas = await this.totemRepository.findTrancasByTotemId(totemId);
+
+    // Se não houver trancas, lançar erro ou retornar uma resposta vazia
+    if (trancas.length === 0) {
+      throw new AppError(
+        'Nenhuma tranca encontrada para este totem',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
+    }
+
     return trancas.map((tranca) => TrancaEntity.toDomain(tranca));
   }
 
   async listarBicicletas(totemId: number): Promise<Bicicleta[]> {
+    // Verifica se o totem existe
     const totem = await this.totemRepository.findById(totemId);
     if (!totem) {
       throw new AppError(
@@ -65,16 +89,19 @@ export class TotemService {
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
+
+    // Busca as bicicletas associadas ao totem
     const bicicletas =
       await this.totemRepository.findBicicletasByTotemId(totemId);
-    return bicicletas.map((bicicleta) => BicicletaEntity.toDomain(bicicleta));
-  }
 
-  async create(createTotemDto: CreateTotemDto) {
-    const createdTotem = await this.totemRepository.create({
-      descricao: createTotemDto.descricao,
-      localizacao: createTotemDto.localizacao,
-    });
-    return TotemEntity.toDomain(createdTotem);
+    // Se não houver bicicletas, lançar erro ou retornar uma resposta vazia
+    if (bicicletas.length === 0) {
+      throw new AppError(
+        'Nenhuma bicicleta encontrada para este totem',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
+    }
+
+    return bicicletas.map((bicicleta) => BicicletaEntity.toDomain(bicicleta));
   }
 }
