@@ -45,7 +45,7 @@ export class TrancasService {
     const trancaExistente = await this.trancaRepository.findById(idTranca);
     if (!trancaExistente) {
       throw new AppError(
-        'Tranca não encontrada',
+        'Tranca nao encontrada',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
@@ -68,7 +68,7 @@ export class TrancasService {
     const trancaEntity = await this.trancaRepository.findById(id);
     if (!trancaEntity) {
       throw new AppError(
-        'Tranca não encontrada',
+        'Tranca nao encontrada',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
@@ -79,7 +79,7 @@ export class TrancasService {
     const trancaExistente = await this.trancaRepository.findById(idTranca);
     if (!trancaExistente) {
       throw new AppError(
-        'Tranca não encontrada',
+        'Tranca nao encontrada',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
@@ -111,7 +111,7 @@ export class TrancasService {
       tranca.status === TrancaStatus.EM_REPARO &&
       tranca.funcionarioId !== idFuncionario
     ) {
-      throw new AppError('Ação não permitida', AppErrorType.RESOURCE_CONFLICT);
+      throw new AppError('Ação nao permitida', AppErrorType.RESOURCE_CONFLICT);
     }
 
     await this.validarTotem(idTotem);
@@ -200,7 +200,7 @@ export class TrancasService {
 
     if (tranca.status !== TrancaStatus.OCUPADA) {
       throw new AppError(
-        'A tranca não está ocupada e não pode ser destrancada.',
+        'A tranca nao está ocupada e nao pode ser destrancada.',
         AppErrorType.RESOURCE_CONFLICT,
       );
     }
@@ -210,7 +210,7 @@ export class TrancasService {
 
       if (bicicleta.trancaId !== tranca.id) {
         throw new AppError(
-          'A bicicleta não está associada a esta tranca.',
+          'A bicicleta nao está associada a esta tranca.',
           AppErrorType.RESOURCE_CONFLICT,
         );
       }
@@ -234,7 +234,7 @@ export class TrancasService {
     const tranca = await this.trancaRepository.findById(idTranca);
     if (!tranca) {
       throw new AppError(
-        'Tranca não encontrada',
+        'Tranca nao encontrada',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
@@ -245,7 +245,7 @@ export class TrancasService {
     const totem = await this.totemRepository.findById(idTotem);
     if (!totem) {
       throw new AppError(
-        'Totem não encontrado',
+        'Totem nao encontrado',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
@@ -256,7 +256,7 @@ export class TrancasService {
     const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
     if (!bicicleta) {
       throw new AppError(
-        'Bicicleta não encontrada',
+        'Bicicleta nao encontrada',
         AppErrorType.RESOURCE_NOT_FOUND,
       );
     }

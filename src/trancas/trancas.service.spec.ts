@@ -9,6 +9,7 @@ import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository'
 import { EmailService } from 'src/common/utils/email.service';
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
 import { Opcao } from './dto/retirar-tranca.dto';
+import { BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
 
 const mockEmailService = {
   sendEmail: jest.fn(),
@@ -18,6 +19,7 @@ describe('TrancaService', () => {
   let mockEntity: TrancaEntity;
   let mockDomain: Tranca;
   let mockTotem: any;
+  let mockBicicleta: any;
 
   let service: TrancasService;
   let trancaRepository: TrancaRepository;
@@ -33,13 +35,25 @@ describe('TrancaService', () => {
       anoDeFabricacao: '2012',
       bicicleta: null,
       totem: null,
-      totemId: 0,
-      bicicletaId: 0,
-      funcionarioId: 0,
+      totemId: 1,
+      bicicletaId: 1,
+      funcionarioId: 2,
       logsInsercao: null,
     };
     mockDomain = TrancaEntity.toDomain(mockEntity);
     mockTotem = { id: 1, nome: 'Totem 1' };
+    mockBicicleta = {
+      id: 1,
+      marca: 'marcaBike',
+      modelo: 'Elon Musk',
+      ano: '2012',
+      numero: 1234,
+      status: BicicletaStatus.NOVA,
+      tranca: null,
+      trancaId: 1,
+      funcionarioId: 2,
+      logsInsercao: null,
+    };
     trancaRepository = {
       create: jest.fn(),
       update: jest.fn(),
@@ -109,7 +123,7 @@ describe('TrancaService', () => {
   it('should not delete when tranca not found', async () => {
     jest.spyOn(trancaRepository, 'findById').mockResolvedValue(null);
     await expect(service.delete(mockEntity.id)).rejects.toThrow(
-      'Tranca não encontrada',
+      'Tranca nao encontrada',
     );
     expect(trancaRepository.findById).toHaveBeenCalled();
   });
@@ -138,7 +152,7 @@ describe('TrancaService', () => {
     it('should throw error when tranca not found', async () => {
       jest.spyOn(trancaRepository, 'findById').mockResolvedValue(null);
       await expect(service.findById(mockEntity.id)).rejects.toThrow(
-        new AppError('Tranca não encontrada', AppErrorType.RESOURCE_NOT_FOUND),
+        new AppError('Tranca nao encontrada', AppErrorType.RESOURCE_NOT_FOUND),
       );
       expect(trancaRepository.findById).toHaveBeenCalled();
     });
@@ -159,7 +173,7 @@ describe('TrancaService', () => {
     it('should not update when tranca not found', async () => {
       jest.spyOn(trancaRepository, 'findById').mockResolvedValue(null);
       await expect(service.update(mockEntity.id, mockEntity)).rejects.toThrow(
-        'Tranca não encontrada',
+        'Tranca nao encontrada',
       );
       expect(trancaRepository.findById).toHaveBeenCalled();
     });
@@ -198,7 +212,7 @@ describe('TrancaService', () => {
       jest.spyOn(trancaRepository, 'findById').mockResolvedValue(null);
 
       await expect(service.incluirNoTotem(incluirTrancaDto)).rejects.toThrow(
-        'Tranca não encontrada',
+        'Tranca nao encontrada',
       );
     });
 
@@ -229,7 +243,7 @@ describe('TrancaService', () => {
       jest.spyOn(trancaRepository, 'findById').mockResolvedValue(mockEntity);
 
       await expect(service.incluirNoTotem(incluirTrancaDto)).rejects.toThrow(
-        'Ação não permitida',
+        'Ação nao permitida',
       );
     });
 
@@ -244,22 +258,23 @@ describe('TrancaService', () => {
       jest.spyOn(totemRepository, 'findById').mockResolvedValue(null);
 
       await expect(service.incluirNoTotem(incluirTrancaDto)).rejects.toThrow(
-        'Totem não encontrado',
+        'Totem nao encontrado',
       );
     });
   });
   describe('retirarDoTotem', () => {
-    it('should retirar tranca from the network if valida and opcao = Aposentadoria', async () => {
-      trancaRepository.findById = jest.fn().mockResolvedValue({
-        id: 1,
-        status: TrancaStatus.REPARO_SOLICITADO,
-      });
+    it('should retirar tranca for aposentadoria when valid', async () => {
+      mockEntity.status = TrancaStatus.REPARO_SOLICITADO;
+      jest.spyOn(trancaRepository, 'findById').mockResolvedValue(mockEntity);
+      jest.spyOn(trancaRepository, 'update').mockResolvedValue(mockEntity);
+
       await service.retirarDoTotem({
         idTranca: 1,
         idFuncionario: 2,
         idTotem: 1,
         opcao: Opcao.APOSENTADORIA,
       });
+
       expect(trancaRepository.update).toHaveBeenCalledWith(1, {
         status: TrancaStatus.APOSENTADA,
       });
@@ -267,9 +282,162 @@ describe('TrancaService', () => {
         'supervisor@equipamento.com',
         'Retirada de Tranca',
         expect.stringContaining(
-          `A tranca de número 1 foi retirada para APOSENTADORIA`,
+          'A tranca de número 1 foi retirada para APOSENTADORIA',
         ),
       );
+    });
+  });
+
+  it('should retirar tranca from the network if valida and opcao = REPARO', async () => {
+    mockEntity.status = TrancaStatus.REPARO_SOLICITADO;
+    jest.spyOn(trancaRepository, 'findById').mockResolvedValue(mockEntity);
+    jest.spyOn(trancaRepository, 'update').mockResolvedValue(mockEntity);
+    jest.spyOn(mockEmailService, 'sendEmail').mockResolvedValue(mockEntity);
+
+    await service.retirarDoTotem({
+      idTranca: 1,
+      idFuncionario: 2,
+      idTotem: 1,
+      opcao: Opcao.EM_REPARO,
+    });
+
+    expect(trancaRepository.update).toHaveBeenCalledWith(1, {
+      status: TrancaStatus.EM_REPARO,
+    });
+    expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
+      'supervisor@equipamento.com',
+      'Retirada de Tranca',
+      expect.stringContaining(`A tranca de número 1 foi retirada para REPARO`),
+    );
+  });
+
+  it('should throw error if tranca not found', async () => {
+    jest.spyOn(trancaRepository, 'findById').mockResolvedValue(null);
+    await expect(service.findById(mockEntity.id)).rejects.toThrow(
+      new AppError('Tranca nao encontrada', AppErrorType.RESOURCE_NOT_FOUND),
+    );
+    expect(trancaRepository.findById).toHaveBeenCalledWith(mockEntity.id);
+  });
+
+  it('should throw error if tranca status is invalid for retirada', async () => {
+    mockEntity.status = TrancaStatus.OCUPADA;
+    jest.spyOn(trancaRepository, 'findById').mockResolvedValue(mockEntity);
+
+    await expect(
+      service.retirarDoTotem({
+        idTranca: 1,
+        idFuncionario: 2,
+        idTotem: 1,
+        opcao: Opcao.APOSENTADORIA,
+      }),
+    ).rejects.toThrow('Tranca está com status inválido para retirar do totem');
+  });
+
+  describe('trancar', () => {
+    it('should trancar a tranca when conditions are valid', async () => {
+      jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
+      jest.spyOn(service, 'validarBicicleta').mockResolvedValue(mockBicicleta);
+      jest.spyOn(trancaRepository, 'update').mockResolvedValue(mockEntity);
+      jest
+        .spyOn(bicicletaRepository, 'update')
+        .mockResolvedValue(mockBicicleta);
+
+      mockEntity.status = TrancaStatus.LIVRE;
+
+      await expect(
+        service.trancar({ idTranca: 1, idBicicleta: 1 }),
+      ).resolves.toBeUndefined();
+
+      expect(service.validarTranca).toHaveBeenCalledWith(1);
+      expect(service.validarBicicleta).toHaveBeenCalledWith(1);
+      expect(bicicletaRepository.update).toHaveBeenCalledWith(1, {
+        status: 'DISPONIVEL',
+      });
+      expect(trancaRepository.update).toHaveBeenCalledWith(1, {
+        status: 'OCUPADA',
+        bicicleta: { id: 1 },
+      });
+    });
+
+    it('should throw an error if tranca status is invalid', async () => {
+      mockEntity.status = TrancaStatus.OCUPADA;
+      jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
+
+      await expect(
+        service.trancar({ idTranca: 1, idBicicleta: 1 }),
+      ).rejects.toThrow(
+        new AppError(
+          'A tranca está com status inválido para ser trancada',
+          AppErrorType.RESOURCE_CONFLICT,
+        ),
+      );
+
+      expect(service.validarTranca).toHaveBeenCalledWith(1);
+      expect(trancaRepository.update).not.toHaveBeenCalled();
+    });
+
+    it('should throw an error if bicicleta is invalid', async () => {
+      mockEntity.status = TrancaStatus.LIVRE;
+      jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
+      jest
+        .spyOn(service, 'validarBicicleta')
+        .mockRejectedValue(
+          new AppError(
+            'Bicicleta nao encontrada',
+            AppErrorType.RESOURCE_CONFLICT,
+          ),
+        );
+
+      await expect(
+        service.trancar({ idTranca: 1, idBicicleta: 1 }),
+      ).rejects.toThrow('Bicicleta nao encontrada');
+
+      expect(service.validarTranca).toHaveBeenCalledWith(1);
+      expect(service.validarBicicleta).toHaveBeenCalledWith(1);
+      expect(trancaRepository.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('destrancar', () => {
+    it('should destrancar a tranca when conditions are valid', async () => {
+      mockEntity.status = TrancaStatus.OCUPADA;
+      jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
+      jest.spyOn(service, 'validarBicicleta').mockResolvedValue(mockBicicleta);
+      jest.spyOn(trancaRepository, 'update').mockResolvedValue(mockEntity);
+      jest
+        .spyOn(bicicletaRepository, 'update')
+        .mockResolvedValue(mockBicicleta);
+
+      await expect(
+        service.destrancar({ idTranca: 1, idBicicleta: 1 }),
+      ).resolves.toBeUndefined();
+
+      expect(service.validarTranca).toHaveBeenCalledWith(1);
+      expect(service.validarBicicleta).toHaveBeenCalledWith(1);
+      expect(bicicletaRepository.update).toHaveBeenCalledWith(1, {
+        status: 'EM_USO',
+      });
+      expect(trancaRepository.update).toHaveBeenCalledWith(1, {
+        status: 'LIVRE',
+        bicicleta: null,
+      });
+    });
+
+    it('should throw an error if tranca is not occupied', async () => {
+      mockEntity.status = TrancaStatus.LIVRE;
+      jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
+
+      await expect(
+        service.destrancar({ idTranca: 1, idBicicleta: 1 }),
+      ).rejects.toThrow(
+        new AppError(
+          'A tranca nao está ocupada e nao pode ser destrancada.',
+          AppErrorType.RESOURCE_CONFLICT,
+        ),
+      );
+
+      expect(service.validarTranca).toHaveBeenCalledWith(1);
+      expect(trancaRepository.update).not.toHaveBeenCalled();
     });
   });
 });
