@@ -7,6 +7,8 @@ export class CustomValidationError extends Error {
 }
 
 const CustomValidationPipe = new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
   exceptionFactory: (errors) => {
     return new CustomValidationError(errors);
   },
