@@ -335,14 +335,14 @@ describe('TrancaService', () => {
 
   describe('trancar', () => {
     it('should trancar a tranca when conditions are valid', async () => {
+      // Certifique-se de que a tranca tenha um status válido
+      mockEntity.status = TrancaStatus.NOVA; // Ou TrancaStatus.EM_REPARO
       jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
       jest.spyOn(service, 'validarBicicleta').mockResolvedValue(mockBicicleta);
       jest.spyOn(trancaRepository, 'update').mockResolvedValue(mockEntity);
       jest
         .spyOn(bicicletaRepository, 'update')
         .mockResolvedValue(mockBicicleta);
-
-      mockEntity.status = TrancaStatus.LIVRE;
 
       await expect(
         service.trancar({ idTranca: 1, idBicicleta: 1 }),
@@ -351,16 +351,17 @@ describe('TrancaService', () => {
       expect(service.validarTranca).toHaveBeenCalledWith(1);
       expect(service.validarBicicleta).toHaveBeenCalledWith(1);
       expect(bicicletaRepository.update).toHaveBeenCalledWith(1, {
-        status: 'DISPONIVEL',
+        status: BicicletaStatus.DISPONIVEL,
       });
       expect(trancaRepository.update).toHaveBeenCalledWith(1, {
-        status: 'OCUPADA',
+        status: TrancaStatus.OCUPADA,
         bicicleta: { id: 1 },
       });
     });
 
     it('should throw an error if tranca status is invalid', async () => {
-      mockEntity.status = TrancaStatus.OCUPADA;
+      // Defina a tranca com status inválido para testar o erro
+      mockEntity.status = TrancaStatus.OCUPADA; // Ou qualquer status inválido
       jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
 
       await expect(
@@ -377,7 +378,8 @@ describe('TrancaService', () => {
     });
 
     it('should throw an error if bicicleta is invalid', async () => {
-      mockEntity.status = TrancaStatus.LIVRE;
+      // A tranca está ocupada, mas a bicicleta não está válida
+      mockEntity.status = TrancaStatus.NOVA;
       jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
       jest
         .spyOn(service, 'validarBicicleta')
@@ -396,11 +398,26 @@ describe('TrancaService', () => {
       expect(service.validarBicicleta).toHaveBeenCalledWith(1);
       expect(trancaRepository.update).not.toHaveBeenCalled();
     });
+
+    it('should trancar without associating bicicleta if idBicicleta is not provided', async () => {
+      mockEntity.status = TrancaStatus.NOVA; // Ou TrancaStatus.EM_REPARO
+      jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
+      jest.spyOn(trancaRepository, 'update').mockResolvedValue(mockEntity);
+
+      await expect(service.trancar({ idTranca: 1 })).resolves.toBeUndefined();
+
+      expect(service.validarTranca).toHaveBeenCalledWith(1);
+      expect(trancaRepository.update).toHaveBeenCalledWith(1, {
+        status: TrancaStatus.OCUPADA,
+        bicicleta: null, // Não associando bicicleta
+      });
+    });
   });
 
   describe('destrancar', () => {
     it('should destrancar a tranca when conditions are valid', async () => {
-      mockEntity.status = TrancaStatus.OCUPADA;
+      mockEntity.status = TrancaStatus.OCUPADA; // Tranca ocupada
+      mockBicicleta.status = BicicletaStatus.DISPONIVEL; // Bicicleta disponível
       jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
       jest.spyOn(service, 'validarBicicleta').mockResolvedValue(mockBicicleta);
       jest.spyOn(trancaRepository, 'update').mockResolvedValue(mockEntity);
@@ -415,28 +432,28 @@ describe('TrancaService', () => {
       expect(service.validarTranca).toHaveBeenCalledWith(1);
       expect(service.validarBicicleta).toHaveBeenCalledWith(1);
       expect(bicicletaRepository.update).toHaveBeenCalledWith(1, {
-        status: 'EM_USO',
+        status: BicicletaStatus.DISPONIVEL,
       });
       expect(trancaRepository.update).toHaveBeenCalledWith(1, {
-        status: 'LIVRE',
+        status: TrancaStatus.LIVRE,
         bicicleta: null,
       });
     });
 
-    it('should throw an error if tranca is not occupied', async () => {
-      mockEntity.status = TrancaStatus.LIVRE;
+    it('should throw an error if bicicleta is invalid', async () => {
+      mockEntity.status = TrancaStatus.OCUPADA;
+      mockBicicleta.status = BicicletaStatus.EM_USO; // Bicicleta não disponível
       jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
+      jest.spyOn(service, 'validarBicicleta').mockResolvedValue(mockBicicleta);
 
       await expect(
         service.destrancar({ idTranca: 1, idBicicleta: 1 }),
       ).rejects.toThrow(
-        new AppError(
-          'A tranca nao está ocupada e nao pode ser destrancada.',
-          AppErrorType.RESOURCE_CONFLICT,
-        ),
+        'A bicicleta não pode ser removida da tranca, pois não está disponível',
       );
 
       expect(service.validarTranca).toHaveBeenCalledWith(1);
+      expect(service.validarBicicleta).toHaveBeenCalledWith(1);
       expect(trancaRepository.update).not.toHaveBeenCalled();
     });
   });

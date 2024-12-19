@@ -7,7 +7,6 @@ import { TrancaEntity } from './domain/tranca.entity';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 import { TotemRepository } from 'src/totens/domain/totem.repository';
 import { generateRandomNumber } from 'src/common/utils/random-number';
-import { TrancamentoTrancaDto } from './dto/tracamento-tranca.dto';
 import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
 import { BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
@@ -171,10 +170,19 @@ export class TrancasService {
     );
     return `Resposta do envio de e-mail:' ${emailResponse}`;
   }
-  async trancar({ idTranca, idBicicleta }: TrancamentoTrancaDto) {
+  async trancar({
+    idTranca,
+    idBicicleta,
+  }: {
+    idTranca: number;
+    idBicicleta?: number;
+  }) {
     const tranca = await this.validarTranca(idTranca);
 
-    if (tranca.status !== TrancaStatus.LIVRE) {
+    if (
+      tranca.status !== TrancaStatus.NOVA &&
+      tranca.status !== TrancaStatus.EM_REPARO
+    ) {
       throw new AppError(
         'A tranca está com status inválido para ser trancada',
         AppErrorType.RESOURCE_CONFLICT,
@@ -187,15 +195,27 @@ export class TrancasService {
       await this.bicicletaRepository.update(idBicicleta, {
         status: BicicletaStatus.DISPONIVEL,
       });
-    }
 
-    await this.trancaRepository.update(idTranca, {
-      status: TrancaStatus.OCUPADA,
-      bicicleta: { id: idBicicleta },
-    });
+      await this.trancaRepository.update(idTranca, {
+        status: TrancaStatus.OCUPADA,
+        bicicleta: { id: idBicicleta },
+      });
+    } else {
+      // Se o idBicicleta não for fornecido, apenas tranca sem associar bicicleta
+      await this.trancaRepository.update(idTranca, {
+        status: TrancaStatus.OCUPADA,
+        bicicleta: null, // Ou se a associação for nula
+      });
+    }
   }
 
-  async destrancar({ idTranca, idBicicleta }: TrancamentoTrancaDto) {
+  async destrancar({
+    idTranca,
+    idBicicleta,
+  }: {
+    idTranca: number;
+    idBicicleta?: number;
+  }) {
     const tranca = await this.validarTranca(idTranca);
 
     if (tranca.status !== TrancaStatus.OCUPADA) {
@@ -205,30 +225,70 @@ export class TrancasService {
       );
     }
 
+    // Se foi fornecido o idBicicleta, podemos validar e garantir que a bicicleta está associada à tranca
     if (idBicicleta) {
       const bicicleta = await this.validarBicicleta(idBicicleta);
 
-      if (bicicleta.trancaId !== tranca.id) {
+      if (bicicleta.status !== BicicletaStatus.DISPONIVEL) {
         throw new AppError(
-          'A bicicleta nao está associada a esta tranca.',
+          'A bicicleta não pode ser removida da tranca, pois não está disponível',
           AppErrorType.RESOURCE_CONFLICT,
         );
       }
 
+      // Remove a associação da bicicleta com a tranca
+      await this.trancaRepository.update(idTranca, {
+        status: TrancaStatus.LIVRE,
+        bicicleta: null, // Removendo a associação da bicicleta
+      });
+
+      // Atualiza a bicicleta, caso necessário
       await this.bicicletaRepository.update(idBicicleta, {
-        status: BicicletaStatus.EM_USO,
+        status: BicicletaStatus.DISPONIVEL, // Ou o status que faz sentido para a bicicleta
+      });
+    } else {
+      // Se não forneceu idBicicleta, apenas destranca a tranca
+      await this.trancaRepository.update(idTranca, {
+        status: TrancaStatus.LIVRE,
+        bicicleta: null, // Garantindo que a tranca está livre
       });
     }
+  }
 
-    await this.trancaRepository.update(idTranca, {
-      status: TrancaStatus.LIVRE,
-      bicicleta: null,
-    });
+  async changeStatus(idTranca: number, acao: string) {
+    await this.validarTranca(idTranca);
+
+    const novoStatus = this.ActionToTrancaStatus(acao);
+
+    await this.bicicletaRepository.update(idTranca, { status: novoStatus });
+
+    return { id: idTranca, status: novoStatus };
   }
 
   // ========================
   // Métodos Auxiliares
   // ========================
+
+  private ActionToTrancaStatus(acao: string): BicicletaStatus {
+    const statusMap = {
+      LIVRE: TrancaStatus.LIVRE,
+      OCUPADA: TrancaStatus.OCUPADA,
+      EM_REPARO: TrancaStatus.EM_REPARO,
+      APOSENTAR: TrancaStatus.APOSENTADA,
+      REPARO_SOLICITADO: TrancaStatus.REPARO_SOLICITADO,
+    };
+
+    const novoStatus = statusMap[acao];
+
+    if (!novoStatus) {
+      throw new AppError(
+        'Ação de status inválida',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
+    }
+
+    return novoStatus;
+  }
 
   async validarTranca(idTranca: number) {
     const tranca = await this.trancaRepository.findById(idTranca);

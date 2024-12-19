@@ -58,12 +58,27 @@ export class TrancasController {
     return this.trancasService.retirarDoTotem(retirarTrancaDto);
   }
 
-  @Post('/destrancar')
-  async destrancar(@Body() tracamentoTrancaDto: TrancamentoTrancaDto) {
-    return this.trancasService.destrancar(tracamentoTrancaDto);
+  @Post(':idTranca/trancar')
+  async trancar(
+    @Param('idTranca') idTranca: number,
+    @Body() tracamentoTrancaDto: TrancamentoTrancaDto,
+  ) {
+    return this.trancasService.trancar({ idTranca, ...tracamentoTrancaDto });
   }
-  @Post('/trancar')
-  async trancar(@Body() tracamentoTrancaDto: TrancamentoTrancaDto) {
-    return this.trancasService.trancar(tracamentoTrancaDto);
+
+  @Post(':idTranca/destrancar')
+  async destrancar(
+    @Param('idTranca') idTranca: number,
+    @Body() tracamentoTrancaDto: TrancamentoTrancaDto,
+  ) {
+    return this.trancasService.destrancar({ idTranca, ...tracamentoTrancaDto });
+  }
+
+  @Post(':idTranca/status/:acao')
+  async trocarStatus(
+    @Param('idTranca', ParseIntPipe) idTranca: number,
+    @Param('acao') acao: string,
+  ) {
+    return this.trancasService.changeStatus(idTranca, acao);
   }
 }
