@@ -1,10 +1,12 @@
-import { IsString, Matches } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 
 export class CreateBicicletaDto {
   @IsString()
+  @IsNotEmpty()
   marca: string;
 
   @IsString()
+  @IsNotEmpty()
   modelo: string;
 
   @IsString()

@@ -37,15 +37,15 @@ POST {{baseurl}}/bicicleta/integrarNaRede/
 Content-Type: application/json
 
 {
-   "idBicicleta": 2,
-   "idTranca": 1,
-   "idFuncionario": 0
+   "idBicicleta": 3,
+   "idTranca":3,
+   "idFuncionario": 1
 }
 ###
 
 ### mudar status
 
-POST {{baseurl}}/bicicleta/3/status/REPARO_SOLICITADO/
+POST {{baseurl}}/bicicleta/1/status/REPARO_SOLICITADO/
 
 
 
@@ -55,16 +55,19 @@ POST {{baseurl}}/bicicleta/retirarDaRede/
 Content-Type: application/json
 
 {
-   "idBicicleta": 3,
-   "idTranca": 1,
-   "idFuncionario": 1,
-   "opcao": "REPARO"
+   "idBicicleta": 1,
+   "idTranca":1,
+   "idFuncionario": 0,
+   "statusAcaoReparador": "APOSENTADA"
 }
 
 ### TRANCAS
 
 # Obter todas as trancas
 GET {{baseurl}}/tranca/
+###
+POST {{baseurl}}/tranca/2/status/REPARO_SOLICITADO/
+
 ###
 
 # Atualizar dados de uma tranca
@@ -76,22 +79,36 @@ Content-Type: application/json
 }
 ###
 
+
 # Integrar tranca na rede
 POST {{baseurl}}/tranca/integrarNaRede
 Content-Type: application/json
 
 {
-    "idTranca": 1,
+    "idTranca": 2,
     "idFuncionario": 0,
     "idTotem": 1
 }
 
 ###
 
+POST {{baseurl}}/tranca/retirarDoTotem
+Content-Type: application/json
+
+{
+    "idTranca": 3,
+    "idFuncionario": 0,
+    "idTotem": 1,
+    "statusAcaoReparador": "EM_REPARO"
+    
+    
+}
+
+###
 GET {{baseurl}}/totem/1/trancas
 ###
 
-GET {{baseurl}}/tranca
+GET {{baseurl}}/tranca/1
 ###
 POST {{baseurl}}/tranca/destrancar
 Content-Type: application/json
@@ -108,7 +125,7 @@ POST {{baseurl}}/tranca/
 Content-Type: application/json
 
 {   
-    "anoDeFabricacao": "2000",
+    "anoDeFabricacao": "2030",
     "modelo": "Delabeneta"
 }
 ####

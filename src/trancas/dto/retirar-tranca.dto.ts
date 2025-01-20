@@ -1,6 +1,6 @@
 import { IsEnum, IsNumber } from 'class-validator';
 
-export enum Opcao {
+export enum StatusAcaoReparador {
   APOSENTADORIA = 'APOSENTADORIA',
   EM_REPARO = 'REPARO',
 }
@@ -12,6 +12,6 @@ export class RetirarTrancaDto {
   idTotem: number;
   @IsNumber()
   idFuncionario: number;
-  @IsEnum(Opcao)
-  opcao: Opcao;
+  @IsEnum(StatusAcaoReparador)
+  statusAcaoReparador: StatusAcaoReparador;
 }

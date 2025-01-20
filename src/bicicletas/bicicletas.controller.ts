@@ -21,7 +21,7 @@ export class BicicletasController {
   constructor(private readonly bicicletasService: BicicletasService) {}
 
   @Post()
-  @HttpCode(201)
+  @HttpCode(200)
   create(@Body() createBicicletaDto: CreateBicicletaDto) {
     return this.bicicletasService.create(createBicicletaDto);
   }

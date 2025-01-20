@@ -6,12 +6,12 @@ import { TrancaEntity } from './domain/tranca.entity';
 import { TotemRepository } from 'src/totens/domain/totem.repository';
 import { IncluirTrancaDto } from './dto/incluir-tranca.dto';
 import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
-import { EmailService } from 'src/common/utils/email.service';
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
-import { Opcao } from './dto/retirar-tranca.dto';
+import { StatusAcaoReparador } from './dto/retirar-tranca.dto';
 import { BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
+import { ExternoService } from 'src/common/utils/externo.service';
 
-const mockEmailService = {
+const mockExternoService = {
   sendEmail: jest.fn(),
 };
 
@@ -91,7 +91,7 @@ describe('TrancaService', () => {
           useValue: totemRepository,
         },
         { provide: 'BicicletaRepository', useValue: bicicletaRepository },
-        { provide: EmailService, useValue: mockEmailService },
+        { provide: ExternoService, useValue: mockExternoService },
       ],
     }).compile();
 
@@ -191,9 +191,9 @@ describe('TrancaService', () => {
       jest.spyOn(totemRepository, 'findById').mockResolvedValue(mockTotem);
       jest.spyOn(trancaRepository, 'update').mockResolvedValue(mockEntity);
 
-      await expect(
-        service.incluirNoTotem(incluirTrancaDto),
-      ).resolves.toBeUndefined();
+      await expect(service.incluirNoTotem(incluirTrancaDto)).resolves.toBe(
+        'tranca foi incluída com sucesso',
+      );
       expect(trancaRepository.findById).toHaveBeenCalledWith(1);
       expect(totemRepository.findById).toHaveBeenCalledWith(1);
       expect(trancaRepository.update).toHaveBeenCalledWith(1, {
@@ -272,18 +272,16 @@ describe('TrancaService', () => {
         idTranca: 1,
         idFuncionario: 2,
         idTotem: 1,
-        opcao: Opcao.APOSENTADORIA,
+        statusAcaoReparador: StatusAcaoReparador.APOSENTADORIA,
       });
 
       expect(trancaRepository.update).toHaveBeenCalledWith(1, {
         status: TrancaStatus.APOSENTADA,
       });
-      expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
+      expect(mockExternoService.sendEmail).toHaveBeenCalledWith(
         'supervisor@equipamento.com',
-        'Retirada de Tranca',
-        expect.stringContaining(
-          'A tranca de número 1 foi retirada para APOSENTADORIA',
-        ),
+        'Retirada da Tranca',
+        'A tranca de número 1 foi retirada para APOSENTADORIA',
       );
     });
   });
@@ -292,22 +290,22 @@ describe('TrancaService', () => {
     mockEntity.status = TrancaStatus.REPARO_SOLICITADO;
     jest.spyOn(trancaRepository, 'findById').mockResolvedValue(mockEntity);
     jest.spyOn(trancaRepository, 'update').mockResolvedValue(mockEntity);
-    jest.spyOn(mockEmailService, 'sendEmail').mockResolvedValue(mockEntity);
+    jest.spyOn(mockExternoService, 'sendEmail').mockResolvedValue(mockEntity);
 
     await service.retirarDoTotem({
       idTranca: 1,
       idFuncionario: 2,
       idTotem: 1,
-      opcao: Opcao.EM_REPARO,
+      statusAcaoReparador: StatusAcaoReparador.EM_REPARO,
     });
 
     expect(trancaRepository.update).toHaveBeenCalledWith(1, {
       status: TrancaStatus.EM_REPARO,
     });
-    expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
+    expect(mockExternoService.sendEmail).toHaveBeenCalledWith(
       'supervisor@equipamento.com',
-      'Retirada de Tranca',
-      expect.stringContaining(`A tranca de número 1 foi retirada para REPARO`),
+      'Retirada da Tranca',
+      `A tranca de número 1 foi retirada para REPARO`,
     );
   });
 
@@ -328,7 +326,7 @@ describe('TrancaService', () => {
         idTranca: 1,
         idFuncionario: 2,
         idTotem: 1,
-        opcao: Opcao.APOSENTADORIA,
+        statusAcaoReparador: StatusAcaoReparador.APOSENTADORIA,
       }),
     ).rejects.toThrow('Tranca está com status inválido para retirar do totem');
   });

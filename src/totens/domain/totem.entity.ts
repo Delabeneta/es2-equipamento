@@ -12,9 +12,9 @@ export class TotemEntity {
   static toDomain(totemEntity: TotemEntity) {
     if (!totemEntity) return null;
     const totem = new Totem();
+    totem.id = totemEntity.id;
     totem.localizacao = totemEntity.localizacao;
     totem.descricao = totemEntity.descricao;
-    totem.id = totemEntity.id;
 
     return totem;
   }

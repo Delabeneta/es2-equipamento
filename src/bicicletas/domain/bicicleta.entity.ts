@@ -15,10 +15,10 @@ export class BicicletaEntity {
   static toDomain(entity: BicicletaEntity) {
     if (!entity) return null;
     const bicicleta = new Bicicleta();
-    bicicleta.ano = entity.ano;
     bicicleta.id = entity.id;
     bicicleta.marca = entity.marca;
     bicicleta.modelo = entity.modelo;
+    bicicleta.ano = entity.ano;
     bicicleta.numero = entity.numero;
     bicicleta.status = entity.status;
     return bicicleta;

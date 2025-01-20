@@ -8,9 +8,10 @@ import { TrancaRepository } from 'src/trancas/domain/tranca.repository';
 import { TrancaStatus } from 'src/trancas/domain/tranca';
 import { IncludeBicicletaOnTrancaDto } from './dto/include-bicicleta-on-tranca.dto';
 import { BicicletaEntity } from './domain/bicicleta.entity';
-import { EmailService } from 'src/common/utils/email.service';
 import { RetirarBicicletaDaTrancaDto } from './dto/retirar-bicicleta-on-tranca';
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
+import { ExternoService } from 'src/common/utils/externo.service';
+import { AluguelService } from 'src/common/utils/aluguel.service';
 
 @Injectable()
 export class BicicletasService {
@@ -19,7 +20,8 @@ export class BicicletasService {
     private readonly bicicletaRepository: BicicletaRepository,
     @Inject('TrancaRepository')
     private readonly trancaRepository: TrancaRepository,
-    private readonly emailService: EmailService,
+    private readonly externoService: ExternoService,
+    private readonly aluguelService: AluguelService,
   ) {}
 
   // *********************
@@ -97,8 +99,29 @@ export class BicicletasService {
       );
     }
 
+    const funcionario =
+      await this.aluguelService.getFuncionarioById(idFuncionario);
+
+    if (!funcionario) {
+      throw new AppError(
+        'Funcionario nao encontrado',
+        AppErrorType.RESOURCE_NOT_FOUND,
+      );
+    }
+
+    if (
+      bicicleta.status == BicicletaStatus.EM_REPARO &&
+      idFuncionario != bicicleta.funcionarioId
+    ) {
+      throw new AppError(
+        'Funcionario precisa ser o mesmo que retirou',
+        AppErrorType.RESOURCE_INVALID,
+      );
+    }
+
     const dataHoraInsercao = new Date().toISOString();
 
+    // Registro da inclusão da bicicleta e atualização do status
     await this.bicicletaRepository.saveLogInsercao(idBicicleta, {
       dataHoraInsercao,
       idTranca,
@@ -113,10 +136,12 @@ export class BicicletasService {
       bicicleta: { id: bicicleta.id },
     });
 
-    await this.emailService.sendEmail(
-      'reparador@equipamento.com',
-      'Inclusao de Bicicleta',
-      `A bicicleta de número ${idBicicleta} foi incluida.\nData/Hora: ${dataHoraInsercao}`,
+    // Envio do e-mail
+
+    await this.externoService.sendEmail(
+      funcionario.email,
+      'Inclusão de Bicicleta',
+      `A bicicleta de número ${idBicicleta} foi incluída.\nData/Hora: ${dataHoraInsercao}`,
     );
   }
 
@@ -124,14 +149,14 @@ export class BicicletasService {
     idBicicleta,
     idTranca,
     idFuncionario,
-    opcao,
+    statusAcaoReparador,
   }: RetirarBicicletaDaTrancaDto) {
     const bicicleta = await this.validarBicicleta(idBicicleta);
 
     if (bicicleta.status !== BicicletaStatus.REPARO_SOLICITADO) {
       throw new AppError(
-        'Bicicleta está com status inválido para retirar do totem',
-        AppErrorType.RESOURCE_CONFLICT,
+        'A bicicleta não está em estado de REPARO_SOLICITADO',
+        AppErrorType.RESOURCE_INVALID,
       );
     }
 
@@ -142,8 +167,18 @@ export class BicicletasService {
       tranca.bicicletaId !== idBicicleta
     ) {
       throw new AppError(
-        'Tranca ou bicicleta estão em status inválido',
-        AppErrorType.RESOURCE_CONFLICT,
+        'Tranca não está ocupada para retirar a bicicleta',
+        AppErrorType.RESOURCE_INVALID,
+      );
+    }
+
+    const funcionario =
+      await this.aluguelService.getFuncionarioById(idFuncionario);
+
+    if (!funcionario) {
+      throw new AppError(
+        'Funcionario nao encontrado',
+        AppErrorType.RESOURCE_NOT_FOUND,
       );
     }
 
@@ -154,7 +189,11 @@ export class BicicletasService {
 
     bicicleta.funcionarioId = idFuncionario;
 
-    await this.BicicletaStatusUpdate(bicicleta.id, idFuncionario, opcao);
+    await this.BicicletaStatusUpdate(
+      bicicleta.id,
+      idFuncionario,
+      statusAcaoReparador,
+    );
 
     const dataHoraRetirada = new Date().toISOString();
 
@@ -162,15 +201,12 @@ export class BicicletasService {
       dataHoraInsercao: dataHoraRetirada,
       idTranca,
     });
-
-    return this.emailService.sendEmail(
-      'reparador@equipamento.com',
+    await this.externoService.sendEmail(
+      funcionario.email,
       'Retirada de Bicicleta',
-      `A bicicleta de número ${idBicicleta} foi retirada para ${opcao}.
-      Data/Hora: ${dataHoraRetirada}`,
+      `A bicicleta de número ${idBicicleta} foi retirada para ${statusAcaoReparador}.`,
     );
   }
-
   async changeStatus(idBicicleta: number, acao: string) {
     await this.validarBicicleta(idBicicleta);
 
@@ -182,6 +218,28 @@ export class BicicletasService {
   }
 
   // Métodos Auxiliares
+
+  private ActionToBicicletaStatus(acao: string): BicicletaStatus {
+    const statusMap = {
+      DISPONIVEL: BicicletaStatus.DISPONIVEL,
+      EM_USO: BicicletaStatus.EM_USO,
+      NOVA: BicicletaStatus.NOVA,
+      APOSENTADA: BicicletaStatus.APOSENTADA,
+      REPARO_SOLICITADO: BicicletaStatus.REPARO_SOLICITADO,
+      EM_REPARO: BicicletaStatus.EM_REPARO,
+    };
+
+    const novoStatus = statusMap[acao];
+
+    if (!novoStatus) {
+      throw new AppError(
+        'Ação de status inválida',
+        AppErrorType.RESOURCE_INVALID, // Reflete 422
+      );
+    }
+
+    return novoStatus;
+  }
 
   public async validarBicicleta(idBicicleta: number) {
     const bicicleta = await this.bicicletaRepository.findById(idBicicleta);
@@ -215,7 +273,7 @@ export class BicicletasService {
     ) {
       throw new AppError(
         'Bicicleta está com status inválido para inserir no totem',
-        AppErrorType.RESOURCE_CONFLICT,
+        AppErrorType.RESOURCE_INVALID,
       );
     }
 
@@ -233,19 +291,19 @@ export class BicicletasService {
   private async BicicletaStatusUpdate(
     idBicicleta: number,
     idFuncionario: number,
-    opcao: string,
+    statusAcaoReparador: string,
   ) {
     const statusMap = {
-      REPARO: BicicletaStatus.EM_REPARO,
-      APOSENTADORIA: BicicletaStatus.APOSENTADA,
+      EM_REPARO: BicicletaStatus.EM_REPARO,
+      APOSENTADA: BicicletaStatus.APOSENTADA,
     };
 
-    const acaoDoRepador = statusMap[opcao];
+    const acaoDoRepador = statusMap[statusAcaoReparador];
 
     if (!acaoDoRepador) {
       throw new AppError(
         'Opçao inválida para retirada da bicicleta',
-        AppErrorType.RESOURCE_CONFLICT,
+        AppErrorType.RESOURCE_INVALID,
       );
     }
 
@@ -253,26 +311,5 @@ export class BicicletasService {
       status: acaoDoRepador,
       funcionarioId: idFuncionario,
     });
-  }
-
-  private ActionToBicicletaStatus(acao: string): BicicletaStatus {
-    const statusMap = {
-      APOSENTAR: BicicletaStatus.APOSENTADA,
-      EM_USO: BicicletaStatus.EM_USO,
-      EM_REPARO: BicicletaStatus.EM_REPARO,
-      DISPONIVEL: BicicletaStatus.DISPONIVEL,
-      REPARO_SOLICITADO: BicicletaStatus.REPARO_SOLICITADO,
-    };
-
-    const novoStatus = statusMap[acao];
-
-    if (!novoStatus) {
-      throw new AppError(
-        'Ação de status inválida',
-        AppErrorType.RESOURCE_NOT_FOUND,
-      );
-    }
-
-    return novoStatus;
   }
 }

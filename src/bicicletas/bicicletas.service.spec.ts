@@ -6,11 +6,18 @@ import { BicicletaRepository } from './domain/bicicleta.repository';
 import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
 import { BicicletaEntity } from './domain/bicicleta.entity';
 import { TrancaStatus } from 'src/trancas/domain/tranca';
-import { EmailService } from 'src/common/utils/email.service';
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
+import { ExternoService } from 'src/common/utils/externo.service';
+import { StatusAcaoReparador } from './dto/retirar-bicicleta-on-tranca';
+import { AluguelService } from 'src/common/utils/aluguel.service';
+import { FuncionarioFuncao } from 'src/common/domain/funcionario';
 
-const mockEmailService = {
-  sendEmail: jest.fn(), // Simula o método sendEmail
+const mockExternoService = {
+  sendEmail: jest.fn(),
+};
+
+const mockAluguelService = {
+  getFuncionarioById: jest.fn(),
 };
 
 describe('BicicletasService', () => {
@@ -33,22 +40,18 @@ describe('BicicletasService', () => {
       update: jest.fn(),
     };
 
-    // configurar ambiente de teste
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BicicletasService,
         { provide: 'BicicletaRepository', useValue: bicicletaRepository },
         { provide: 'TrancaRepository', useValue: trancaRepository },
-        { provide: EmailService, useValue: mockEmailService },
+        { provide: ExternoService, useValue: mockExternoService },
+        { provide: AluguelService, useValue: mockAluguelService },
       ],
     }).compile();
 
     bicicletasService = module.get<BicicletasService>(BicicletasService);
   });
-
-  // **************************
-  ///   TESTES_MÉTODOS_CRUD
-  // **************************
 
   describe('create', () => {
     it('should create a new bicicleta', async () => {
@@ -60,9 +63,7 @@ describe('BicicletasService', () => {
 
       bicicletaRepository.create = jest.fn().mockResolvedValue({
         id: 1,
-        ano: createBicicletaDto.ano,
-        marca: createBicicletaDto.marca,
-        modelo: createBicicletaDto.modelo,
+        ...createBicicletaDto,
         status: BicicletaStatus.NOVA,
       } as BicicletaEntity);
 
@@ -70,9 +71,7 @@ describe('BicicletasService', () => {
 
       expect(bicicletaRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          modelo: 'Modelo A',
-          ano: '2022',
-          marca: 'Marca X',
+          ...createBicicletaDto,
           status: BicicletaStatus.NOVA,
         }),
       );
@@ -96,9 +95,9 @@ describe('BicicletasService', () => {
     });
 
     it('should throw an error if bicicleta is not aposentada', async () => {
-      bicicletaRepository.findById = jest
-        .fn()
-        .mockResolvedValue({ status: BicicletaStatus.NOVA });
+      bicicletaRepository.findById = jest.fn().mockResolvedValue({
+        status: BicicletaStatus.NOVA,
+      });
 
       await expect(bicicletasService.delete(1)).rejects.toThrow(
         'Apenas bicicletas aposentadas podem ser excluídas',
@@ -117,20 +116,19 @@ describe('BicicletasService', () => {
   describe('update', () => {
     it('should throw an error if bicicleta does not exist', async () => {
       bicicletaRepository.findById = jest.fn().mockResolvedValue(null);
+
       await expect(bicicletasService.update(1, null)).rejects.toThrow(
         'Bicicleta nao encontrada',
       );
     });
 
-    it('should update if bicicleta exists', async () => {
+    it('should update bicicleta if it exists', async () => {
       const bicicleta = {
         id: 1,
         ano: '2022',
         marca: 'caloi',
         modelo: 'bmx',
         status: BicicletaStatus.NOVA,
-        funcionarioId: 0,
-        trancaId: 0,
       } as BicicletaEntity;
 
       const updated = {
@@ -152,6 +150,7 @@ describe('BicicletasService', () => {
       expect(result).toHaveProperty('marca', updated.marca);
     });
   });
+
   describe('findAll', () => {
     it('should return all bicicletas', async () => {
       const bicicleta = {
@@ -160,8 +159,6 @@ describe('BicicletasService', () => {
         marca: 'caloi',
         modelo: 'bmx',
         status: BicicletaStatus.NOVA,
-        funcionarioId: 0,
-        trancaId: 0,
       } as BicicletaEntity;
 
       bicicletaRepository.findAll = jest.fn().mockResolvedValue([bicicleta]);
@@ -173,6 +170,7 @@ describe('BicicletasService', () => {
       expect(result).toStrictEqual([bicicletaDomain]);
     });
   });
+
   describe('findById', () => {
     it('should return the bicicleta if it exists', async () => {
       const bicicleta = {
@@ -181,8 +179,6 @@ describe('BicicletasService', () => {
         marca: 'caloi',
         modelo: 'bmx',
         status: BicicletaStatus.NOVA,
-        funcionarioId: 0,
-        trancaId: 0,
       } as BicicletaEntity;
 
       bicicletaRepository.findById = jest.fn().mockResolvedValue(bicicleta);
@@ -193,10 +189,11 @@ describe('BicicletasService', () => {
       expect(bicicletaRepository.findById).toHaveBeenCalledWith(1);
       expect(result).toStrictEqual(bicicletaDomain);
     });
-    it('should not return bicicleta if it not exists', () => {
+
+    it('should throw an error if bicicleta does not exist', async () => {
       bicicletaRepository.findById = jest.fn().mockResolvedValue(null);
 
-      expect(bicicletasService.findById(1)).rejects.toThrow(
+      await expect(bicicletasService.findById(1)).rejects.toThrow(
         new AppError(
           'Bicicleta nao encontrada',
           AppErrorType.RESOURCE_NOT_FOUND,
@@ -205,18 +202,25 @@ describe('BicicletasService', () => {
     });
   });
 
-  // ****************************
-  /// TESTES_MÉTODOS_DE_NEGÓCIO
-  // ****************************
-
   describe('incluirBicicletaNaRede', () => {
     it('should include bicicleta in the network if valid', async () => {
       bicicletaRepository.findById = jest.fn().mockResolvedValue({
         id: 1,
         status: BicicletaStatus.NOVA,
       });
+
       trancaRepository.findById = jest.fn().mockResolvedValue({
         status: TrancaStatus.LIVRE,
+      });
+
+      mockAluguelService.getFuncionarioById = jest.fn().mockResolvedValue({
+        id: 123,
+        matricula: '4534',
+        nome: 'João Silva',
+        idade: 12,
+        email: 'reparador@equipamento.com',
+        cpf: 'teste',
+        funcao: FuncionarioFuncao.ADMINISTRADOR,
       });
 
       await bicicletasService.incluirBicicletaNaRede({
@@ -228,6 +232,7 @@ describe('BicicletasService', () => {
       expect(bicicletaRepository.update).toHaveBeenCalledWith(1, {
         status: BicicletaStatus.DISPONIVEL,
       });
+
       expect(trancaRepository.update).toHaveBeenCalledWith(1, {
         status: TrancaStatus.OCUPADA,
         bicicleta: { id: 1 },
@@ -239,6 +244,7 @@ describe('BicicletasService', () => {
         status: BicicletaStatus.DISPONIVEL,
       });
 
+      // Esperando o erro de conflito
       await expect(
         bicicletasService.incluirBicicletaNaRede({
           idBicicleta: 1,
@@ -259,6 +265,7 @@ describe('BicicletasService', () => {
         funcionarioId: 12,
       });
 
+      // Esperando o erro se o funcionário não for o mesmo que retirou
       await expect(
         bicicletasService.incluirBicicletaNaRede({
           idBicicleta: 1,
@@ -271,6 +278,7 @@ describe('BicicletasService', () => {
     it('should throw an error if bicicleta is not found', async () => {
       bicicletaRepository.findById = jest.fn().mockResolvedValue(null);
 
+      // Esperando o erro de "Bicicleta não encontrada"
       await expect(
         bicicletasService.incluirBicicletaNaRede({
           idBicicleta: 1,
@@ -305,10 +313,11 @@ describe('BicicletasService', () => {
         id: 1,
         status: BicicletaStatus.NOVA,
       });
-      trancaRepository.findById = jest
-        .fn()
-        .mockResolvedValue({ status: TrancaStatus.OCUPADA });
+      trancaRepository.findById = jest.fn().mockResolvedValue({
+        status: TrancaStatus.OCUPADA,
+      });
 
+      // Esperando o erro de "Tranca não está disponível"
       await expect(
         bicicletasService.incluirBicicletaNaRede({
           idBicicleta: 1,
@@ -322,7 +331,7 @@ describe('BicicletasService', () => {
   /// funcao para retirar bicicleta da Rede
 
   describe('retirarBicicletaDaRede', () => {
-    it('should retirar bicicleta from the network if valid and opcao = Reparo', async () => {
+    it('should retirar bicicleta from the network if valid and acaoStatusReparador = EM_Reparo', async () => {
       bicicletaRepository.findById = jest.fn().mockResolvedValue({
         id: 1,
         status: BicicletaStatus.REPARO_SOLICITADO,
@@ -334,11 +343,26 @@ describe('BicicletasService', () => {
         bicicletaId: 1,
       });
 
+      mockAluguelService.getFuncionarioById = jest.fn().mockResolvedValue({
+        id: 123,
+        matricula: '4534',
+        nome: 'João Silva',
+        idade: 12,
+        email: 'reparador@equipamento.com',
+        cpf: 'teste',
+        funcao: FuncionarioFuncao.ADMINISTRADOR,
+      });
+
+      bicicletaRepository.update = jest.fn().mockResolvedValue({
+        id: 1,
+        status: BicicletaStatus.EM_REPARO,
+      });
+
       await bicicletasService.retirarBicicletaDaRede({
         idBicicleta: 1,
         idTranca: 2,
         idFuncionario: 123,
-        opcao: 'REPARO',
+        statusAcaoReparador: StatusAcaoReparador.EM_REPARO,
       });
 
       expect(trancaRepository.update).toHaveBeenCalledWith(2, {
@@ -353,14 +377,14 @@ describe('BicicletasService', () => {
         dataHoraInsercao: expect.any(String),
         idTranca: 2,
       });
-      expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
+
+      expect(mockExternoService.sendEmail).toHaveBeenCalledWith(
         'reparador@equipamento.com',
         'Retirada de Bicicleta',
-        expect.stringContaining(
-          'A bicicleta de número 1 foi retirada para REPARO.',
-        ),
+        'A bicicleta de número 1 foi retirada para EM_REPARO.',
       );
     });
+
     it('should retirar bicicleta from the network if valid and opcao = APOSENTADORIA', async () => {
       bicicletaRepository.findById = jest.fn().mockResolvedValue({
         id: 1,
@@ -373,11 +397,21 @@ describe('BicicletasService', () => {
         bicicletaId: 1,
       });
 
+      mockAluguelService.getFuncionarioById = jest.fn().mockResolvedValue({
+        id: 123,
+        matricula: '4534',
+        nome: 'João Silva',
+        idade: 12,
+        email: 'reparador@equipamento.com',
+        cpf: 'teste',
+        funcao: FuncionarioFuncao.ADMINISTRADOR,
+      });
+
       await bicicletasService.retirarBicicletaDaRede({
         idBicicleta: 1,
         idTranca: 2,
         idFuncionario: 123,
-        opcao: 'APOSENTADORIA',
+        statusAcaoReparador: StatusAcaoReparador.APOSENTADA,
       });
 
       expect(trancaRepository.update).toHaveBeenCalledWith(2, {
@@ -392,78 +426,10 @@ describe('BicicletasService', () => {
         dataHoraInsercao: expect.any(String),
         idTranca: 2,
       });
-      expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
+      expect(mockExternoService.sendEmail).toHaveBeenCalledWith(
         'reparador@equipamento.com',
         'Retirada de Bicicleta',
-        expect.stringContaining(
-          'A bicicleta de número 1 foi retirada para APOSENTADORIA.',
-        ),
-      );
-    });
-    it('should retirar bicicleta from the network if valid and opcao = APOSENTADORIA', async () => {
-      bicicletaRepository.findById = jest.fn().mockResolvedValue({
-        id: 1,
-        status: BicicletaStatus.REPARO_SOLICITADO,
-      });
-
-      trancaRepository.findById = jest.fn().mockResolvedValue({
-        id: 2,
-        status: TrancaStatus.OCUPADA,
-        bicicletaId: 1,
-      });
-
-      await bicicletasService.retirarBicicletaDaRede({
-        idBicicleta: 1,
-        idTranca: 2,
-        idFuncionario: 123,
-        opcao: 'APOSENTADORIA',
-      });
-
-      expect(trancaRepository.update).toHaveBeenCalledWith(2, {
-        status: TrancaStatus.LIVRE,
-        bicicleta: null,
-      });
-      expect(bicicletaRepository.update).toHaveBeenCalledWith(1, {
-        funcionarioId: 123,
-        status: BicicletaStatus.APOSENTADA,
-      });
-      expect(bicicletaRepository.saveLogInsercao).toHaveBeenCalledWith(1, {
-        dataHoraInsercao: expect.any(String),
-        idTranca: 2,
-      });
-      expect(mockEmailService.sendEmail).toHaveBeenCalledWith(
-        'reparador@equipamento.com',
-        'Retirada de Bicicleta',
-        expect.stringContaining(
-          'A bicicleta de número 1 foi retirada para APOSENTADORIA.',
-        ),
-      );
-    });
-    it('should throw an error if opcao is invalid', async () => {
-      bicicletaRepository.findById = jest.fn().mockResolvedValue({
-        id: 1,
-        status: BicicletaStatus.REPARO_SOLICITADO,
-      });
-
-      trancaRepository.findById = jest.fn().mockResolvedValue({
-        id: 2,
-        status: TrancaStatus.OCUPADA,
-        bicicletaId: 1,
-      });
-
-      // Simula a chamada ao método com uma opção inválida
-      await expect(
-        bicicletasService.retirarBicicletaDaRede({
-          idBicicleta: 1,
-          idTranca: 2,
-          idFuncionario: 123,
-          opcao: 'teste', // Valor inválido
-        }),
-      ).rejects.toThrow(
-        new AppError(
-          'Opçao inválida para retirada da bicicleta',
-          AppErrorType.RESOURCE_CONFLICT,
-        ),
+        'A bicicleta de número 1 foi retirada para APOSENTADA.',
       );
     });
 
@@ -475,7 +441,7 @@ describe('BicicletasService', () => {
           idBicicleta: 1,
           idTranca: 2,
           idFuncionario: 123,
-          opcao: 'REPARO',
+          statusAcaoReparador: StatusAcaoReparador.EM_REPARO,
         }),
       ).rejects.toThrow(
         new AppError(
@@ -498,15 +464,71 @@ describe('BicicletasService', () => {
           idBicicleta: 1,
           idTranca: 2,
           idFuncionario: 123,
-          opcao: 'REPARO',
+          statusAcaoReparador: StatusAcaoReparador.EM_REPARO,
         }),
       ).rejects.toThrow(
         new AppError('Tranca nao encontrada', AppErrorType.RESOURCE_NOT_FOUND),
       );
     });
+
+    it('should throw an error if tranca status is not OCUPADA', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue({
+        id: 1,
+        status: BicicletaStatus.REPARO_SOLICITADO,
+      });
+
+      trancaRepository.findById = jest.fn().mockResolvedValue({
+        id: 2,
+        status: TrancaStatus.LIVRE,
+      });
+
+      await expect(
+        bicicletasService.retirarBicicletaDaRede({
+          idBicicleta: 1,
+          idTranca: 2,
+          idFuncionario: 123,
+          statusAcaoReparador: StatusAcaoReparador.EM_REPARO,
+        }),
+      ).rejects.toThrow(
+        new AppError(
+          'Tranca não está ocupada para retirar a bicicleta',
+          AppErrorType.RESOURCE_CONFLICT,
+        ),
+      );
+    });
+    it('should throw an error if bicicleta status is not REPARO_SOLICITADO', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue({
+        id: 1,
+        status: BicicletaStatus.EM_USO,
+      });
+
+      trancaRepository.findById = jest.fn().mockResolvedValue({
+        id: 2,
+        status: TrancaStatus.OCUPADA,
+        bicicletaId: 1,
+      });
+
+      mockAluguelService.getFuncionarioById = jest.fn().mockResolvedValue({
+        id: 123,
+        matricula: '4534',
+        nome: 'João Silva',
+        idade: 12,
+        email: 'reparador@equipamento.com',
+        cpf: 'teste',
+        funcao: FuncionarioFuncao.ADMINISTRADOR,
+      });
+
+      await expect(
+        bicicletasService.retirarBicicletaDaRede({
+          idBicicleta: 1,
+          idTranca: 2,
+          idFuncionario: 123,
+          statusAcaoReparador: StatusAcaoReparador.APOSENTADA,
+        }),
+      ).rejects.toThrow('A bicicleta não está em estado de REPARO_SOLICITADO');
+    });
   });
 
-  /// mudança de status
   describe('changeStatus', () => {
     it('should update the status to APOSENTADA when action is "APOSENTAR"', async () => {
       const mockBicicleta = { id: 1, status: BicicletaStatus.NOVA };
@@ -516,7 +538,7 @@ describe('BicicletasService', () => {
         status: BicicletaStatus.APOSENTADA,
       });
 
-      const result = await bicicletasService.changeStatus(1, 'APOSENTAR');
+      const result = await bicicletasService.changeStatus(1, 'APOSENTADA');
       expect(result.status).toBe(BicicletaStatus.APOSENTADA);
     });
 
@@ -532,7 +554,7 @@ describe('BicicletasService', () => {
       expect(result.status).toBe(BicicletaStatus.EM_USO);
     });
 
-    it('should update the status to EM_USO when action is "EM_REPARO"', async () => {
+    it('should update the status to EM_REPARO when action is "EM_REPARO"', async () => {
       const mockBicicleta = { id: 2, status: BicicletaStatus.NOVA };
       bicicletaRepository.findById = jest.fn().mockResolvedValue(mockBicicleta);
       bicicletaRepository.update = jest.fn().mockResolvedValue({
@@ -544,7 +566,7 @@ describe('BicicletasService', () => {
       expect(result.status).toBe(BicicletaStatus.EM_REPARO);
     });
 
-    it('should update the status to DISPONIVEL when action is "disponivel"', async () => {
+    it('should update the status to DISPONIVEL when action is "DISPONIVEL"', async () => {
       const mockBicicleta = { id: 2, status: BicicletaStatus.NOVA };
       bicicletaRepository.findById = jest.fn().mockResolvedValue(mockBicicleta);
       bicicletaRepository.update = jest.fn().mockResolvedValue({

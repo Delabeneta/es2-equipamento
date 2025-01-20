@@ -1,12 +1,24 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsInt, IsEnum, IsNotEmpty } from 'class-validator';
+
+export enum StatusAcaoReparador {
+  APOSENTADA = 'APOSENTADA',
+  EM_REPARO = 'EM_REPARO',
+}
 
 export class RetirarBicicletaDaTrancaDto {
-  @IsNumber()
+  @IsInt()
+  @IsNotEmpty()
   idTranca: number;
-  @IsNumber()
-  idFuncionario: number;
-  @IsNumber()
+
+  @IsInt()
+  @IsNotEmpty()
   idBicicleta: number;
-  @IsString()
-  opcao: string;
+
+  @IsInt()
+  @IsNotEmpty()
+  idFuncionario: number;
+
+  @IsEnum(StatusAcaoReparador)
+  @IsNotEmpty()
+  statusAcaoReparador: StatusAcaoReparador;
 }

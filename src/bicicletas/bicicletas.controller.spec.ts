@@ -4,7 +4,10 @@ import { BicicletasService } from './bicicletas.service';
 import { CreateBicicletaDto } from './dto/create-bicicleta.dto';
 import { UpdateBicicletaDto } from './dto/update-bicicleta.dto';
 import { IncludeBicicletaOnTrancaDto } from './dto/include-bicicleta-on-tranca.dto';
-import { RetirarBicicletaDaTrancaDto } from './dto/retirar-bicicleta-on-tranca';
+import {
+  RetirarBicicletaDaTrancaDto,
+  StatusAcaoReparador,
+} from './dto/retirar-bicicleta-on-tranca';
 
 describe('BicicletasController', () => {
   let bicicletasController: BicicletasController;
@@ -122,7 +125,7 @@ describe('BicicletasController', () => {
         idBicicleta: 1,
         idTranca: 2,
         idFuncionario: 0,
-        opcao: 'REPARO',
+        statusAcaoReparador: StatusAcaoReparador.EM_REPARO,
       };
 
       await bicicletasController.retirarDaRede(retirarBicicletaDaTrancaDto);

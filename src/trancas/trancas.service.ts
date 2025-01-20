@@ -10,8 +10,11 @@ import { generateRandomNumber } from 'src/common/utils/random-number';
 import { BicicletaRepository } from 'src/bicicletas/domain/bicicleta.repository';
 import { BicicletaStatus } from 'src/bicicletas/domain/bicicleta';
 import { AppError, AppErrorType } from 'src/common/domain/app-error';
-import { Opcao, RetirarTrancaDto } from './dto/retirar-tranca.dto';
-import { EmailService } from 'src/common/utils/email.service';
+import {
+  RetirarTrancaDto,
+  StatusAcaoReparador,
+} from './dto/retirar-tranca.dto';
+import { ExternoService } from 'src/common/utils/externo.service';
 
 @Injectable()
 export class TrancasService {
@@ -22,7 +25,7 @@ export class TrancasService {
     private readonly totemRepository: TotemRepository,
     @Inject('BicicletaRepository')
     private readonly bicicletaRepository: BicicletaRepository,
-    private readonly emailService: EmailService,
+    private readonly externoService: ExternoService,
   ) {}
 
   // ========================
@@ -102,7 +105,7 @@ export class TrancasService {
     ) {
       throw new AppError(
         'Tranca está com status inválido para inserir no totem',
-        AppErrorType.RESOURCE_CONFLICT,
+        AppErrorType.RESOURCE_INVALID,
       );
     }
 
@@ -119,9 +122,23 @@ export class TrancasService {
       status: TrancaStatus.LIVRE,
       totem: { id: idTotem },
     });
+
+    // const dataHoraInsercao = new Date().toISOString();
+
+    await this.externoService.sendEmail(
+      'supervisor@equipamento.com',
+      'Inclusão de Tranca',
+      `A tranca de número ${idTranca} foi incluída`,
+    );
+
+    return 'tranca foi incluída com sucesso';
   }
 
-  async retirarDoTotem({ idTranca, idFuncionario, opcao }: RetirarTrancaDto) {
+  async retirarDoTotem({
+    idTranca,
+    idFuncionario,
+    statusAcaoReparador,
+  }: RetirarTrancaDto) {
     const tranca = await this.validarTranca(idTranca);
 
     if (tranca.status !== TrancaStatus.REPARO_SOLICITADO) {
@@ -132,18 +149,18 @@ export class TrancasService {
     }
     tranca.funcionarioId = idFuncionario;
 
-    if (opcao === Opcao.EM_REPARO) {
+    if (statusAcaoReparador === StatusAcaoReparador.EM_REPARO) {
       await this.trancaRepository.update(idTranca, {
         status: TrancaStatus.EM_REPARO,
       });
-    } else if (opcao === Opcao.APOSENTADORIA) {
+    } else if (statusAcaoReparador === StatusAcaoReparador.APOSENTADORIA) {
       await this.trancaRepository.update(idTranca, {
         status: TrancaStatus.APOSENTADA,
       });
     } else {
       throw new AppError(
         'Opcao invalida para retirada da tranca',
-        AppErrorType.RESOURCE_CONFLICT,
+        AppErrorType.RESOURCE_INVALID,
       );
     }
 
@@ -152,7 +169,7 @@ export class TrancasService {
       totem: null,
     });
 
-    const dataHoraRetirada = new Date().toISOString();
+    //const dataHoraRetirada = new Date().toISOString();
 
     const logInsercao = {
       dataHoraInsercao: new Date().toISOString(),
@@ -161,14 +178,12 @@ export class TrancasService {
     };
     await this.trancaRepository.saveLogInsercao(idTranca, logInsercao);
 
-    const emailResponse = await this.emailService.sendEmail(
+    await this.externoService.sendEmail(
       'supervisor@equipamento.com',
-      'Retirada de Tranca',
-      `A tranca de número ${idTranca} foi retirada para ${opcao}.
-    Data/Hora: ${dataHoraRetirada}
-    Funcionario: ${idFuncionario}`,
+      'Retirada da Tranca',
+      `A tranca de número ${idTranca} foi retirada para ${statusAcaoReparador}`,
     );
-    return `Resposta do envio de e-mail:' ${emailResponse}`;
+    return 'tranca retirada com sucesso';
   }
   async trancar({
     idTranca,
@@ -283,7 +298,7 @@ export class TrancasService {
     if (!novoStatus) {
       throw new AppError(
         'Ação de status inválida',
-        AppErrorType.RESOURCE_NOT_FOUND,
+        AppErrorType.RESOURCE_INVALID,
       );
     }
 
