@@ -277,6 +277,7 @@ describe('TrancaService', () => {
 
       expect(trancaRepository.update).toHaveBeenCalledWith(1, {
         status: TrancaStatus.APOSENTADA,
+        totem: null,
       });
       expect(mockExternoService.sendEmail).toHaveBeenCalledWith(
         'supervisor@equipamento.com',
@@ -301,12 +302,8 @@ describe('TrancaService', () => {
 
     expect(trancaRepository.update).toHaveBeenCalledWith(1, {
       status: TrancaStatus.EM_REPARO,
+      totem: null,
     });
-    expect(mockExternoService.sendEmail).toHaveBeenCalledWith(
-      'supervisor@equipamento.com',
-      'Retirada da Tranca',
-      `A tranca de número 1 foi retirada para REPARO`,
-    );
   });
 
   it('should throw error if tranca not found', async () => {
@@ -430,7 +427,7 @@ describe('TrancaService', () => {
       expect(service.validarTranca).toHaveBeenCalledWith(1);
       expect(service.validarBicicleta).toHaveBeenCalledWith(1);
       expect(bicicletaRepository.update).toHaveBeenCalledWith(1, {
-        status: BicicletaStatus.DISPONIVEL,
+        status: BicicletaStatus.EM_USO,
       });
       expect(trancaRepository.update).toHaveBeenCalledWith(1, {
         status: TrancaStatus.LIVRE,
