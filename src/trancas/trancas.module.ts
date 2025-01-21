@@ -8,12 +8,12 @@ import { TypeormTotemRepository } from 'src/totens/infra/persistence/repositorie
 import { TypeormTotemEntity } from 'src/totens/infra/persistence/entities/typeorm-totem.entity';
 import { TypeormBicicletaRepository } from 'src/bicicletas/infra/persistence/repositories/typeorm-bicicleta.repository';
 import { TypeormBicicletaEntity } from 'src/bicicletas/infra/persistence/entities/typeorm-bicicleta.entity';
-import { ConfigModule } from '@nestjs/config';
 import { ExternoService } from 'src/common/utils/externo.service';
 import { AluguelService } from 'src/common/utils/aluguel.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ConfigModule], // Importa ConfigModule para acessar variáveis de ambiente
+  imports: [ConfigModule],
   controllers: [TrancasController],
   providers: [
     TrancasService,

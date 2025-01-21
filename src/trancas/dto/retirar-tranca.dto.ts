@@ -2,7 +2,7 @@ import { IsEnum, IsNumber } from 'class-validator';
 
 export enum StatusAcaoReparador {
   APOSENTADORIA = 'APOSENTADORIA',
-  EM_REPARO = 'REPARO',
+  EM_REPARO = 'EM_REPARO',
 }
 
 export class RetirarTrancaDto {

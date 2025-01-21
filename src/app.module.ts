@@ -5,6 +5,9 @@ import { TrancasModule } from './trancas/trancas.module';
 import { TotemModule } from './totens/totem.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import axios from 'axios';
+import AppService from './app.service';
+import { DataSource } from 'typeorm';
+import AppController from './app.controller';
 
 @Global()
 @Module({
@@ -15,7 +18,15 @@ import axios from 'axios';
     TrancasModule,
     TotemModule,
   ],
+  controllers: [AppController],
   providers: [
+    {
+      provide: AppService,
+      useFactory: (dataSource: DataSource) => {
+        return new AppService(dataSource);
+      },
+      inject: [DataSource],
+    },
     {
       provide: 'ExternoMicrosserviceClient',
       inject: [ConfigService],
@@ -37,7 +48,7 @@ import axios from 'axios';
       },
     },
     {
-      provide: 'AluguelMicrosserviceClient', //
+      provide: 'AluguelMicrosserviceClient',
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const aluguelServiceUrl = configService.get<string>(

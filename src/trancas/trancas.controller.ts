@@ -56,7 +56,7 @@ export class TrancasController {
   async inserirNoTotem(@Body() incluirTrancaDto: IncluirTrancaDto) {
     return this.trancasService.incluirNoTotem(incluirTrancaDto);
   }
-  @Post('/retirarNaRede')
+  @Post('/retirarDaRede')
   @HttpCode(200)
   async retirarDaRede(@Body() retirarTrancaDto: RetirarTrancaDto) {
     return this.trancasService.retirarDoTotem(retirarTrancaDto);
@@ -77,7 +77,10 @@ export class TrancasController {
     @Param('idTranca') idTranca: number,
     @Body() tracamentoTrancaDto: TrancamentoTrancaDto,
   ) {
-    return this.trancasService.destrancar({ idTranca, ...tracamentoTrancaDto });
+    return this.trancasService.destrancar({
+      idTranca,
+      idBicicleta: tracamentoTrancaDto.bicicleta,
+    });
   }
 
   @Post(':idTranca/status/:acao')

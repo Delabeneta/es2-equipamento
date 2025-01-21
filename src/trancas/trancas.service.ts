@@ -152,10 +152,12 @@ export class TrancasService {
     if (statusAcaoReparador === StatusAcaoReparador.EM_REPARO) {
       await this.trancaRepository.update(idTranca, {
         status: TrancaStatus.EM_REPARO,
+        totem: null,
       });
     } else if (statusAcaoReparador === StatusAcaoReparador.APOSENTADORIA) {
       await this.trancaRepository.update(idTranca, {
         status: TrancaStatus.APOSENTADA,
+        totem: null,
       });
     } else {
       throw new AppError(
@@ -163,11 +165,6 @@ export class TrancasService {
         AppErrorType.RESOURCE_INVALID,
       );
     }
-
-    await this.trancaRepository.update(idTranca, {
-      status: TrancaStatus.LIVRE,
-      totem: null,
-    });
 
     //const dataHoraRetirada = new Date().toISOString();
 
@@ -259,7 +256,7 @@ export class TrancasService {
 
       // Atualiza a bicicleta, caso necessário
       await this.bicicletaRepository.update(idBicicleta, {
-        status: BicicletaStatus.DISPONIVEL, // Ou o status que faz sentido para a bicicleta
+        status: BicicletaStatus.EM_USO, // Ou o status que faz sentido para a bicicleta
       });
     } else {
       // Se não forneceu idBicicleta, apenas destranca a tranca

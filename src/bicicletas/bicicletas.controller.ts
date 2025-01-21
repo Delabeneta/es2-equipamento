@@ -60,6 +60,7 @@ export class BicicletasController {
   }
 
   @Post('/integrarNaRede')
+  @HttpCode(200)
   async integrarNaRede(
     @Body() includeBicicletaOnTrancaDto: IncludeBicicletaOnTrancaDto,
   ) {
