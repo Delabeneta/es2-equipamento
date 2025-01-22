@@ -393,7 +393,6 @@ describe('TrancaService', () => {
       expect(service.validarBicicleta).toHaveBeenCalledWith(1);
       expect(trancaRepository.update).not.toHaveBeenCalled();
     });
-
     it('should trancar without associating bicicleta if idBicicleta is not provided', async () => {
       mockEntity.status = TrancaStatus.NOVA; // Ou TrancaStatus.EM_REPARO
       jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
@@ -434,7 +433,6 @@ describe('TrancaService', () => {
         bicicleta: null,
       });
     });
-
     it('should throw an error if bicicleta is invalid', async () => {
       mockEntity.status = TrancaStatus.OCUPADA;
       mockBicicleta.status = BicicletaStatus.EM_USO; // Bicicleta não disponível
@@ -450,6 +448,81 @@ describe('TrancaService', () => {
       expect(service.validarTranca).toHaveBeenCalledWith(1);
       expect(service.validarBicicleta).toHaveBeenCalledWith(1);
       expect(trancaRepository.update).not.toHaveBeenCalled();
+    });
+    it('should throw an error if tranca is invalid', async () => {
+      mockEntity.status = TrancaStatus.LIVRE;
+      jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
+
+      await expect(
+        service.destrancar({ idTranca: 1, idBicicleta: 1 }),
+      ).rejects.toThrow(
+        'A tranca nao está ocupada e nao pode ser destrancada.',
+      );
+
+      expect(service.validarTranca).toHaveBeenCalledWith(1);
+      expect(trancaRepository.update).not.toHaveBeenCalled();
+    });
+  });
+  describe('ActionToTrancaStatus', () => {
+    it('should return the correct status for a valid action', () => {
+      const validActions = {
+        LIVRE: TrancaStatus.LIVRE,
+        OCUPADA: TrancaStatus.OCUPADA,
+        EM_REPARO: TrancaStatus.EM_REPARO,
+        APOSENTAR: TrancaStatus.APOSENTADA,
+        REPARO_SOLICITADO: TrancaStatus.REPARO_SOLICITADO,
+      };
+
+      for (const [acao, statusEsperado] of Object.entries(validActions)) {
+        const result = service.ActionToTrancaStatus(acao);
+        expect(result).toBe(statusEsperado);
+      }
+    });
+
+    it('should throw an error for an invalid action', () => {
+      const invalidAction = 'INVALID_ACTION';
+
+      expect(() => service.ActionToTrancaStatus(invalidAction)).toThrow(
+        'Ação de status inválida',
+      );
+    });
+  });
+  describe('validarBicicleta', () => {
+    it('should return the bicicleta if it exists', async () => {
+      const idBicicleta = 1;
+      const mockBicicleta = {
+        id: 1,
+        marca: 'marcaBike',
+        modelo: 'Elon Musk',
+        ano: '2012',
+        numero: 1234,
+        status: BicicletaStatus.NOVA,
+        tranca: null,
+        trancaId: 1,
+        funcionarioId: 2,
+        logsInsercao: null,
+      };
+
+      jest
+        .spyOn(bicicletaRepository, 'findById')
+        .mockResolvedValue(mockBicicleta);
+
+      const result = await service.validarBicicleta(idBicicleta);
+
+      expect(bicicletaRepository.findById).toHaveBeenCalledWith(idBicicleta);
+      expect(result).toEqual(mockBicicleta);
+    });
+
+    it('should throw an error if the bicicleta does not exist', async () => {
+      const idBicicleta = 1;
+
+      jest.spyOn(bicicletaRepository, 'findById').mockResolvedValue(null);
+
+      await expect(service.validarBicicleta(idBicicleta)).rejects.toThrow(
+        'Bicicleta nao encontrada',
+      );
+
+      expect(bicicletaRepository.findById).toHaveBeenCalledWith(idBicicleta);
     });
   });
 });

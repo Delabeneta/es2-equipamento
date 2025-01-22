@@ -8,6 +8,8 @@ import {
   RetirarBicicletaDaTrancaDto,
   StatusAcaoReparador,
 } from './dto/retirar-bicicleta-on-tranca';
+import { BicicletaStatus } from './domain/bicicleta';
+import { AppError, AppErrorType } from 'src/common/domain/app-error';
 
 describe('BicicletasController', () => {
   let bicicletasController: BicicletasController;
@@ -16,6 +18,7 @@ describe('BicicletasController', () => {
   const mockBicicletasService = {
     create: jest.fn(),
     update: jest.fn(),
+    findById: jest.fn(),
     findAll: jest.fn(),
     delete: jest.fn(),
     changeStatus: jest.fn(),
@@ -76,6 +79,45 @@ describe('BicicletasController', () => {
       await bicicletasController.findAll();
 
       expect(bicicletasService.findAll).toHaveBeenCalled();
+    });
+  });
+
+  describe('findById', () => {
+    it('should call BicicletasService.findById', async () => {
+      const mockBicicleta = {
+        id: 1,
+        modelo: 'Modelo A',
+        ano: '2022',
+        numero: 123,
+        status: BicicletaStatus.NOVA,
+        marca: 'test',
+      };
+
+      jest
+        .spyOn(bicicletasService, 'findById')
+        .mockResolvedValue(mockBicicleta);
+
+      const idBicicleta = 1;
+      const result = await bicicletasController.findById(idBicicleta);
+
+      expect(bicicletasService.findById).toHaveBeenCalledWith(idBicicleta);
+      expect(result).toEqual(mockBicicleta);
+    });
+
+    it('should throw an error if bicicleta is not found', async () => {
+      jest
+        .spyOn(bicicletasService, 'findById')
+        .mockRejectedValue(
+          new AppError(
+            'Bicicleta nao encontrada',
+            AppErrorType.RESOURCE_NOT_FOUND,
+          ),
+        );
+
+      await expect(bicicletasController.findById(1)).rejects.toThrow(
+        'Bicicleta nao encontrada',
+      );
+      expect(bicicletasService.findById).toHaveBeenCalledWith(1);
     });
   });
 

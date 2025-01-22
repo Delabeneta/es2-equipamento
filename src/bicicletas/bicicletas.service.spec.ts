@@ -317,7 +317,6 @@ describe('BicicletasService', () => {
         status: TrancaStatus.OCUPADA,
       });
 
-      // Esperando o erro de "Tranca não está disponível"
       await expect(
         bicicletasService.incluirBicicletaNaRede({
           idBicicleta: 1,
@@ -325,6 +324,26 @@ describe('BicicletasService', () => {
           idFuncionario: 123,
         }),
       ).rejects.toThrow('Tranca nao está disponível');
+    });
+    it('should throw an error if funcionario is not found', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue({
+        id: 1,
+        status: BicicletaStatus.NOVA,
+      });
+
+      trancaRepository.findById = jest.fn().mockResolvedValue({
+        status: TrancaStatus.LIVRE,
+      });
+
+      mockAluguelService.getFuncionarioById = jest.fn().mockResolvedValue(null);
+
+      await expect(
+        bicicletasService.incluirBicicletaNaRede({
+          idBicicleta: 1,
+          idTranca: 1,
+          idFuncionario: 10,
+        }),
+      ).rejects.toThrow('Funcionario nao encontrado');
     });
   });
 

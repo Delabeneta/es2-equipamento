@@ -60,4 +60,31 @@ describe('TotemController', () => {
       expect(totemService.delete).toHaveBeenCalledWith(idTotem);
     });
   });
+  describe('getTrancasByTotem', () => {
+    it('should call TotemService.listarTrancas with correct id', async () => {
+      const idTotem = 1;
+      const trancas = [{ id: 1, modelo: 'Tranca 1' }]; // Mock de trancas
+
+      totemService.listarTrancas = jest.fn().mockResolvedValue(trancas);
+
+      const result = await totemController.getTrancasByTotem(idTotem);
+
+      expect(totemService.listarTrancas).toHaveBeenCalledWith(idTotem);
+      expect(result).toEqual(trancas);
+    });
+  });
+
+  describe('getBicicletasByTotem', () => {
+    it('should call TotemService.listarBicicletas with correct id', async () => {
+      const idTotem = 1;
+      const bicicletas = [{ id: 1, modelo: 'Bicicleta 1' }]; // Mock de bicicletas
+
+      totemService.listarBicicletas = jest.fn().mockResolvedValue(bicicletas);
+
+      const result = await totemController.getBicicletasByTotem(idTotem);
+
+      expect(totemService.listarBicicletas).toHaveBeenCalledWith(idTotem);
+      expect(result).toEqual(bicicletas);
+    });
+  });
 });

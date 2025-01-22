@@ -281,7 +281,7 @@ export class TrancasService {
   // Métodos Auxiliares
   // ========================
 
-  private ActionToTrancaStatus(acao: string): BicicletaStatus {
+  ActionToTrancaStatus(acao: string): BicicletaStatus {
     const statusMap = {
       LIVRE: TrancaStatus.LIVRE,
       OCUPADA: TrancaStatus.OCUPADA,
