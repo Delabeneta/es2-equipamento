@@ -123,7 +123,13 @@ export class TrancasService {
       totem: { id: idTotem },
     });
 
-    // const dataHoraInsercao = new Date().toISOString();
+    const dataHoraInsercao = new Date().toISOString();
+    const logInsercao = {
+      dataHoraInsercao,
+      idTranca,
+      idFuncionario,
+    };
+    await this.trancaRepository.saveLogInsercao(idTranca, logInsercao);
 
     await this.externoService.sendEmail(
       'supervisor@equipamento.com',
