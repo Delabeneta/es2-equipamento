@@ -166,14 +166,14 @@ export class TrancasService {
       );
     }
 
-    //const dataHoraRetirada = new Date().toISOString();
+    const dataHoraInsercao = new Date().toISOString();
 
     const logInsercao = {
-      dataHoraInsercao: new Date().toISOString(),
+      dataHoraInsercao,
       idTranca,
       idFuncionario,
     };
-    await this.trancaRepository.saveLogInsercao(idTranca, logInsercao);
+    await this.trancaRepository.saveLogInsercao(logInsercao);
 
     await this.externoService.sendEmail(
       'supervisor@equipamento.com',
@@ -196,7 +196,7 @@ export class TrancasService {
     ) {
       throw new AppError(
         'A tranca está com status inválido para ser trancada',
-        AppErrorType.RESOURCE_CONFLICT,
+        AppErrorType.RESOURCE_INVALID,
       );
     }
 
@@ -243,7 +243,7 @@ export class TrancasService {
       if (bicicleta.status !== BicicletaStatus.DISPONIVEL) {
         throw new AppError(
           'A bicicleta não pode ser removida da tranca, pois não está disponível',
-          AppErrorType.RESOURCE_CONFLICT,
+          AppErrorType.RESOURCE_INVALID,
         );
       }
 

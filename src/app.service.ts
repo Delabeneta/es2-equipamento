@@ -11,7 +11,7 @@ import { TrancaStatus } from './trancas/domain/tranca';
 export default class AppService {
   constructor(
     @Inject('DataSource')
-    private dataSource: DataSource,
+    private readonly dataSource: DataSource,
   ) {}
 
   async restoreDatabase() {
