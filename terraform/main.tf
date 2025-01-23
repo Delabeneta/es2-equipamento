@@ -68,7 +68,7 @@ resource "aws_iam_policy" "es2-equipamento_role_policy" {
           "secretsmanager:ListSecrets",
           "secretsmanager:ListSecretVersionIds"
         ],
-        Resource: "arn:aws:secretsmanager:us-east-1:940482447113:secret:prod/es2-equipamento-dqN7P7"
+        Resource: "arn:aws:secretsmanager:us-east-1:767828743563:secret:prod/es2-equipamento-FjILvA"
       },
       {
         "Effect": "Allow",
