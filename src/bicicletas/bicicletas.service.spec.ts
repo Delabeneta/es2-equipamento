@@ -272,7 +272,7 @@ describe('BicicletasService', () => {
           idTranca: 1,
           idFuncionario: 123,
         }),
-      ).rejects.toThrow('Funcionário nao é o mesmo que a retirou');
+      ).rejects.toThrow('Funcionario precisa ser o mesmo que retirou');
     });
 
     it('should throw an error if bicicleta is not found', async () => {
@@ -546,6 +546,29 @@ describe('BicicletasService', () => {
         }),
       ).rejects.toThrow('A bicicleta não está em estado de REPARO_SOLICITADO');
     });
+    it('should throw an error if funcionario is not found', async () => {
+      bicicletaRepository.findById = jest.fn().mockResolvedValue({
+        id: 1,
+        status: BicicletaStatus.REPARO_SOLICITADO,
+      });
+
+      trancaRepository.findById = jest.fn().mockResolvedValue({
+        id: 2,
+        status: TrancaStatus.OCUPADA,
+        bicicletaId: 1,
+      });
+
+      mockAluguelService.getFuncionarioById = jest.fn().mockResolvedValue(null);
+
+      await expect(
+        bicicletasService.retirarBicicletaDaRede({
+          idBicicleta: 1,
+          idTranca: 2,
+          idFuncionario: 10,
+          statusAcaoReparador: StatusAcaoReparador.EM_REPARO,
+        }),
+      ).rejects.toThrow('Funcionario nao encontrado');
+    });
   });
 
   describe('changeStatus', () => {
@@ -617,6 +640,43 @@ describe('BicicletasService', () => {
       await expect(
         bicicletasService.changeStatus(3, 'invalid_action'),
       ).rejects.toThrow('Ação de status inválida');
+    });
+  });
+  describe('BicicletaStatusUpdate', () => {
+    it('deve atualizar o status da bicicleta para EM_REPARO', async () => {
+      const idBicicleta = 1;
+      const idFuncionario = 2;
+      const statusAcaoReparador = StatusAcaoReparador.EM_REPARO;
+
+      await bicicletasService['BicicletaStatusUpdate'](
+        idBicicleta,
+        idFuncionario,
+        statusAcaoReparador,
+      );
+
+      expect(bicicletaRepository.update).toHaveBeenCalledTimes(1);
+      expect(bicicletaRepository.update).toHaveBeenCalledWith(idBicicleta, {
+        status: 'EM_REPARO',
+        funcionarioId: idFuncionario,
+      });
+    });
+
+    it('deve atualizar o status da bicicleta para APOSENTADA', async () => {
+      const idBicicleta = 1;
+      const idFuncionario = 2;
+      const statusAcaoReparador = 'APOSENTADA';
+
+      await bicicletasService['BicicletaStatusUpdate'](
+        idBicicleta,
+        idFuncionario,
+        statusAcaoReparador,
+      );
+
+      expect(bicicletaRepository.update).toHaveBeenCalledTimes(1);
+      expect(bicicletaRepository.update).toHaveBeenCalledWith(idBicicleta, {
+        status: 'APOSENTADA',
+        funcionarioId: idFuncionario,
+      });
     });
   });
 });

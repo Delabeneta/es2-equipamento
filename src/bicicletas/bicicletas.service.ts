@@ -109,16 +109,6 @@ export class BicicletasService {
       );
     }
 
-    if (
-      bicicleta.status == BicicletaStatus.EM_REPARO &&
-      idFuncionario != bicicleta.funcionarioId
-    ) {
-      throw new AppError(
-        'Funcionario precisa ser o mesmo que retirou',
-        AppErrorType.RESOURCE_INVALID,
-      );
-    }
-
     const dataHoraInsercao = new Date().toISOString();
 
     // Registro da inclusão da bicicleta e atualização do status
@@ -282,12 +272,12 @@ export class BicicletasService {
       bicicleta.funcionarioId !== idFuncionario
     ) {
       throw new AppError(
-        'Funcionário nao é o mesmo que a retirou',
+        'Funcionario precisa ser o mesmo que retirou',
         AppErrorType.RESOURCE_CONFLICT,
       );
     }
   }
-
+  // Status da ação de retirada da bicicleta
   private async BicicletaStatusUpdate(
     idBicicleta: number,
     idFuncionario: number,

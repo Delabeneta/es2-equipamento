@@ -180,7 +180,6 @@ export class TrancasService {
       'Retirada da Tranca',
       `A tranca de número ${idTranca} foi retirada para ${statusAcaoReparador}`,
     );
-    return 'tranca retirada com sucesso';
   }
   async trancar({
     idTranca,

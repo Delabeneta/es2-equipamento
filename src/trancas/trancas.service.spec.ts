@@ -327,6 +327,18 @@ describe('TrancaService', () => {
       }),
     ).rejects.toThrow('Tranca está com status inválido para retirar do totem');
   });
+  it('should throw error if invalid option is provided for statusAcaoReparador', async () => {
+    mockEntity.status = TrancaStatus.REPARO_SOLICITADO;
+    jest.spyOn(trancaRepository, 'findById').mockResolvedValue(mockEntity);
+    await expect(
+      service.retirarDoTotem({
+        idTranca: 1,
+        idFuncionario: 2,
+        idTotem: 1,
+        statusAcaoReparador: 'INVALID_STATUS' as any, // Aqui você coloca um valor inválido
+      }),
+    ).rejects.toThrow('Opcao invalida para retirada da tranca');
+  });
 
   describe('trancar', () => {
     it('should trancar a tranca when conditions are valid', async () => {
@@ -433,6 +445,22 @@ describe('TrancaService', () => {
         bicicleta: null,
       });
     });
+    it('should destrancar without bicicleta if idBicicleta is not provided', async () => {
+      mockEntity.status = TrancaStatus.OCUPADA; // Tranca ocupada
+      jest.spyOn(service, 'validarTranca').mockResolvedValue(mockEntity);
+      jest.spyOn(trancaRepository, 'update').mockResolvedValue(mockEntity);
+
+      // Chama o serviço sem o idBicicleta
+      await expect(
+        service.destrancar({ idTranca: 1 }),
+      ).resolves.toBeUndefined();
+
+      expect(trancaRepository.update).toHaveBeenCalledWith(1, {
+        status: TrancaStatus.LIVRE,
+        bicicleta: null,
+      });
+    });
+
     it('should throw an error if bicicleta is invalid', async () => {
       mockEntity.status = TrancaStatus.OCUPADA;
       mockBicicleta.status = BicicletaStatus.EM_USO; // Bicicleta não disponível

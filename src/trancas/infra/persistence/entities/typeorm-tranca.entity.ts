@@ -15,27 +15,42 @@ import {
 export class TypeormTrancaEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
   @Column()
   numero: number;
-  @Column({ type: 'varchar' })
+
+  @Column()
   status: TrancaStatus;
+
   @Column()
   modelo: string;
+
   @Column()
   anoDeFabricacao: string;
-  @OneToOne(() => TypeormBicicletaEntity, (bicicleta) => bicicleta.tranca)
+
+  @OneToOne(() => TypeormBicicletaEntity, (bicicleta) => bicicleta.tranca, {
+    nullable: true,
+  })
   @JoinColumn()
   bicicleta: TypeormBicicletaEntity | null;
-  @ManyToOne(() => TypeormTotemEntity, (totem) => totem.trancas)
+
+  @ManyToOne(() => TypeormTotemEntity, (totem) => totem.trancas, {
+    nullable: true,
+  })
+  @JoinColumn()
   totem: TypeormTotemEntity | null;
+
   @Column({ nullable: true })
   @RelationId((tranca: TypeormTrancaEntity) => tranca.totem)
   totemId: number;
+
   @Column({ nullable: true })
   @RelationId((tranca: TypeormTrancaEntity) => tranca.bicicleta)
   bicicletaId: number;
+
   @Column({ nullable: true })
   funcionarioId: number;
+
   @Column('text', { nullable: true })
   logsInsercao: string;
 }
