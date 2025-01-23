@@ -173,7 +173,7 @@ export class TrancasService {
       idTranca,
       idFuncionario,
     };
-    await this.trancaRepository.saveLogInsercao(logInsercao);
+    await this.trancaRepository.saveLogInsercao(idTranca, logInsercao);
 
     await this.externoService.sendEmail(
       'supervisor@equipamento.com',
