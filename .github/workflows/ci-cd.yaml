@@ -101,4 +101,4 @@ jobs:
           terraform init
           terraform plan
           terraform apply -auto-approve
-          echo "Done!" 
+          echo "Done!"
