@@ -8,11 +8,17 @@ import axios from 'axios';
 import AppService from './app.service';
 import { DataSource } from 'typeorm';
 import AppController from './app.controller';
+import credentialsConfig from './common/config/credentials.config';
 
 @Global()
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env.local', '.env'],
+      ignoreEnvFile: process.env.NODE_ENV === 'aws-prod' ? true : false,
+      load: [credentialsConfig],
+    }),
     DatabaseModule,
     BicicletasModule,
     TrancasModule,

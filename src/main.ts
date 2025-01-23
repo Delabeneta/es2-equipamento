@@ -5,7 +5,7 @@ import { AppErrorFilter } from './common/filters/app-error.filter';
 import { CustomErrorValidationFilter } from './common/filters/error-validation.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.useGlobalPipes(CustomValidationPipe);
   app.useGlobalFilters(new AppErrorFilter());
   app.useGlobalFilters(new CustomErrorValidationFilter());
