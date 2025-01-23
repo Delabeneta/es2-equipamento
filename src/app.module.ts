@@ -16,7 +16,7 @@ import credentialsConfig from './common/config/credentials.config';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env.local', '.env'],
-      ignoreEnvFile: process.env.NODE_ENV === 'aws-prod' ? true : false,
+      ignoreEnvFile: process.env.NODE_ENV === 'aws-prod',
       load: [credentialsConfig],
     }),
     DatabaseModule,
