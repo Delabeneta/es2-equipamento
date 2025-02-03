@@ -33,6 +33,7 @@ describe('BicicletasService', () => {
       findAll: jest.fn(),
       delete: jest.fn(),
       saveLogInsercao: jest.fn(),
+      findByNumero: jest.fn(),
     };
 
     trancaRepository = {
@@ -78,6 +79,60 @@ describe('BicicletasService', () => {
 
       expect(result).toBeInstanceOf(Bicicleta);
       expect(result).toHaveProperty('id');
+    });
+
+    it('should create a new bicicleta', async () => {
+      const createBicicletaDto: CreateBicicletaDto = {
+        modelo: 'Modelo A',
+        ano: '2022',
+        marca: 'Marca X',
+        status: BicicletaStatus.EM_USO,
+        numero: 1,
+      };
+
+      bicicletaRepository.create = jest.fn().mockResolvedValue({
+        id: 1,
+        ...createBicicletaDto,
+        status: createBicicletaDto.status,
+      } as BicicletaEntity);
+
+      const result = await bicicletasService.create(createBicicletaDto);
+
+      jest.spyOn(bicicletaRepository, 'findByNumero').mockResolvedValue(null);
+
+      expect(bicicletaRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          ...createBicicletaDto,
+          status: createBicicletaDto.status,
+        }),
+      );
+
+      expect(result).toBeInstanceOf(Bicicleta);
+      expect(result).toHaveProperty('id');
+    });
+
+    it('should not create a new bicicleta', async () => {
+      const createBicicletaDto: CreateBicicletaDto = {
+        modelo: 'Modelo A',
+        ano: '2022',
+        marca: 'Marca X',
+        status: BicicletaStatus.EM_USO,
+        numero: 1,
+      };
+
+      bicicletaRepository.create = jest.fn().mockResolvedValue({
+        id: 1,
+        ...createBicicletaDto,
+        status: createBicicletaDto.status,
+      } as BicicletaEntity);
+
+      jest
+        .spyOn(bicicletaRepository, 'findByNumero')
+        .mockResolvedValue({ id: 1, numero: 1 } as BicicletaEntity);
+
+      await expect(
+        bicicletasService.create(createBicicletaDto),
+      ).rejects.toThrow('Já existe uma bicicleta com esse número');
     });
   });
 

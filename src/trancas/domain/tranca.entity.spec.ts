@@ -32,6 +32,30 @@ describe('TrancaEntity', () => {
       expect(trancaDomain.localizacao).toBe('Parque Central');
     });
 
+    it('should handle null localizacao correctly', () => {
+      const bicicleta = new BicicletaEntity();
+      bicicleta.id = 1;
+
+      const trancaEntity = new TrancaEntity();
+      trancaEntity.id = 1;
+      trancaEntity.numero = 42;
+      trancaEntity.status = TrancaStatus.LIVRE;
+      trancaEntity.modelo = 'Modelo X';
+      trancaEntity.localizacao = 'fasdf';
+      trancaEntity.anoDeFabricacao = '2022';
+      trancaEntity.bicicleta = bicicleta;
+
+      const trancaDomain = TrancaEntity.toDomain(trancaEntity);
+
+      expect(trancaDomain.id).toBe(1);
+      expect(trancaDomain.numero).toBe(42);
+      expect(trancaDomain.status).toBe(TrancaStatus.LIVRE);
+      expect(trancaDomain.modelo).toBe('Modelo X');
+      expect(trancaDomain.anoDeFabricacao).toBe('2022');
+      expect(trancaDomain.bicicleta).toBe(1);
+      expect(trancaDomain.localizacao).toBe('fasdf');
+    });
+
     it('should handle null bicicleta and totem correctly', () => {
       const trancaEntity = new TrancaEntity();
       trancaEntity.id = 2;

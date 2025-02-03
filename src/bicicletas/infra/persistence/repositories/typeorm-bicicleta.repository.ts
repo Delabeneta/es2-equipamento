@@ -12,6 +12,16 @@ export class TypeormBicicletaRepository implements BicicletaRepository {
   constructor(
     private readonly repository: Repository<TypeormBicicletaEntity>,
   ) {}
+
+  findByNumero(numero: number): Promise<BicicletaEntity> {
+    return this.repository.findOne({
+      where: {
+        numero,
+        status: Not(BicicletaStatus.EXCLUIDA),
+      },
+    });
+  }
+
   findById(idBicicleta: number): Promise<BicicletaEntity> {
     return this.repository.findOne({
       where: {

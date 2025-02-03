@@ -10,6 +10,15 @@ import { TypeormTrancaEntity } from '../entities/typeorm-tranca.entity';
 
 export class TypeormTrancaRepository implements TrancaRepository {
   constructor(private readonly repository: Repository<TypeormTrancaEntity>) {}
+
+  async findByNumero(numero: number): Promise<TrancaEntity> {
+    const tranca = await this.repository.findOne({
+      where: { numero },
+      relations: { totem: true, bicicleta: true },
+    });
+
+    return tranca;
+  }
   async findById(idTranca: number): Promise<TrancaEntity> {
     const tranca = await this.repository.findOne({
       where: { id: idTranca },

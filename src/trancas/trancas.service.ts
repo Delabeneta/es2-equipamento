@@ -33,13 +33,27 @@ export class TrancasService {
   // ========================
 
   async create(createTrancaDto: CreateTrancaDto) {
-    const trancaNumero = generateRandomNumber();
-    const trancaStatus = TrancaStatus.NOVA;
+    const trancaNumero = createTrancaDto.numero || generateRandomNumber();
+    const trancaStatus = createTrancaDto.status || TrancaStatus.NOVA;
+
+    if (createTrancaDto.numero) {
+      const trancaExistente =
+        await this.trancaRepository.findByNumero(trancaNumero);
+
+      if (trancaExistente) {
+        throw new AppError(
+          'Tranca com este número já existe',
+          AppErrorType.RESOURCE_INVALID,
+        );
+      }
+    }
+
     const createdTranca = await this.trancaRepository.create({
       status: trancaStatus,
       numero: trancaNumero,
       modelo: createTrancaDto.modelo,
       anoDeFabricacao: createTrancaDto.anoDeFabricacao,
+      localizacao: createTrancaDto.localizacao,
     });
     return TrancaEntity.toDomain(createdTranca);
   }

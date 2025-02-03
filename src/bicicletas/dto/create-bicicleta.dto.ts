@@ -1,10 +1,12 @@
 import {
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   Matches,
 } from 'class-validator';
+import { BicicletaStatus } from '../domain/bicicleta';
 
 export class CreateBicicletaDto {
   @IsString()
@@ -22,4 +24,8 @@ export class CreateBicicletaDto {
   @IsNumber()
   @IsOptional()
   numero?: number;
+
+  @IsEnum(BicicletaStatus)
+  @IsOptional()
+  status?: BicicletaStatus;
 }

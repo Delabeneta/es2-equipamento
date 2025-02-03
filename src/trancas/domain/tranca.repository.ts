@@ -6,6 +6,7 @@ export type CreateTranca = {
   modelo: string;
   numero: number;
   status: TrancaStatus;
+  localizacao?: string;
 };
 
 export type UpdateTranca = Partial<CreateTranca> & {
@@ -19,6 +20,7 @@ export type UpdateTranca = Partial<CreateTranca> & {
 
 export interface TrancaRepository {
   findById(idTranca: number): Promise<TrancaEntity>;
+  findByNumero(numero: number): Promise<TrancaEntity>;
   findAll(): Promise<TrancaEntity[]>;
   create(tranca: CreateTranca): Promise<TrancaEntity>;
   update(idTranca: number, data: UpdateTranca): Promise<TrancaEntity>;

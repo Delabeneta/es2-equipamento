@@ -61,6 +61,7 @@ describe('TrancaService', () => {
       findAll: jest.fn(),
       findById: jest.fn(),
       saveLogInsercao: jest.fn(),
+      findByNumero: jest.fn(),
     };
     totemRepository = {
       create: jest.fn(),
@@ -77,6 +78,7 @@ describe('TrancaService', () => {
       findAll: jest.fn(),
       delete: jest.fn(),
       saveLogInsercao: jest.fn(),
+      findByNumero: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -112,6 +114,19 @@ describe('TrancaService', () => {
           modelo: mockEntity.modelo,
         }),
       ).resolves.toStrictEqual(mockDomain);
+    });
+
+    it('should throw an error when creating a tranca with an existing number', async () => {
+      jest
+        .spyOn(trancaRepository, 'findByNumero')
+        .mockResolvedValue(mockEntity);
+      await expect(
+        service.create({
+          anoDeFabricacao: mockEntity.anoDeFabricacao,
+          modelo: mockEntity.modelo,
+          numero: mockEntity.numero,
+        }),
+      ).rejects.toThrow('Tranca com este número já existe');
     });
   });
   it('should delete the tranca', async () => {

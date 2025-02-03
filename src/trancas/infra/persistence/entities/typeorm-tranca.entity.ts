@@ -28,6 +28,9 @@ export class TypeormTrancaEntity {
   @Column()
   anoDeFabricacao: string;
 
+  @Column({ nullable: true })
+  localizacao: string;
+
   @OneToOne(() => TypeormBicicletaEntity, (bicicleta) => bicicleta.tranca, {
     nullable: true,
   })

@@ -140,6 +140,26 @@ describe('TypeormBicicletaRepository', () => {
     });
   });
 
+  describe('findByNumero', () => {
+    it('should find a bicicleta by numero', async () => {
+      const bicicleta = {
+        id: 1,
+        status: BicicletaStatus.NOVA,
+      } as TypeormBicicletaEntity;
+      jest.spyOn(mockRepository, 'findOne').mockResolvedValue(bicicleta);
+
+      const result = await repository.findByNumero(1);
+
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          numero: 1,
+          status: Not(BicicletaStatus.EXCLUIDA),
+        },
+      });
+      expect(result).toEqual(bicicleta);
+    });
+  });
+
   describe('create', () => {
     it('should create and save a new bicicleta', async () => {
       const newBicicleta = {

@@ -91,6 +91,7 @@ export default class AppService {
       status: TrancaStatus.OCUPADA,
       bicicletaId: bicicleta1.id,
       totemId: totem.id,
+      localizacao: 'Rio de Janeiro',
       numero: generateRandomNumber(),
     });
 
@@ -100,6 +101,7 @@ export default class AppService {
       status: TrancaStatus.LIVRE,
       totemId: totem.id,
       numero: generateRandomNumber(),
+      localizacao: 'Rio de Janeiro',
     });
 
     const tranca3 = await trancasRepository.save({
@@ -109,6 +111,7 @@ export default class AppService {
       bicicletaId: bicicleta2.id,
       totemId: totem.id,
       numero: generateRandomNumber(),
+      localizacao: 'Rio de Janeiro',
     });
 
     const tranca4 = await trancasRepository.save({
@@ -118,6 +121,7 @@ export default class AppService {
       bicicletaId: bicicleta5.id,
       totemId: totem.id,
       numero: generateRandomNumber(),
+      localizacao: 'Rio de Janeiro',
     });
 
     await trancasRepository.save({
@@ -126,6 +130,7 @@ export default class AppService {
       status: TrancaStatus.EM_REPARO,
       numero: generateRandomNumber(),
       funcionarioId: 1,
+      localizacao: 'Rio de Janeiro',
     });
 
     await trancasRepository.save({
@@ -134,6 +139,7 @@ export default class AppService {
       status: TrancaStatus.REPARO_SOLICITADO,
       totemId: totem.id,
       numero: generateRandomNumber(),
+      localizacao: 'Rio de Janeiro',
     });
 
     bicicleta1.trancaId = tranca1.id;

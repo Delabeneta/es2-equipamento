@@ -10,6 +10,7 @@ export class TrancaEntity {
   totem: TotemEntity | null;
   totemId: number;
   modelo: string;
+  localizacao?: string;
   anoDeFabricacao: string;
   status: TrancaStatus;
   funcionarioId: number;
@@ -22,6 +23,9 @@ export class TrancaEntity {
     tranca.bicicleta = trancaEntity.bicicleta ? trancaEntity.bicicleta.id : 0;
     tranca.numero = trancaEntity.numero;
     tranca.localizacao = '';
+    if (trancaEntity.localizacao) {
+      tranca.localizacao = trancaEntity.localizacao;
+    }
     tranca.anoDeFabricacao = trancaEntity.anoDeFabricacao;
     if (trancaEntity.totem) {
       tranca.localizacao = trancaEntity.totem.localizacao;

@@ -29,13 +29,25 @@ export class BicicletasService {
   // *********************
 
   async create(createBicicletaDto: CreateBicicletaDto) {
-    const bicicletaNumero = generateRandomNumber();
-    const bicicletaStatus = BicicletaStatus.NOVA;
+    const bicicletaStatus = createBicicletaDto.status || BicicletaStatus.NOVA;
+
+    if (createBicicletaDto.numero) {
+      const bicicletaExistente = await this.bicicletaRepository.findByNumero(
+        createBicicletaDto.numero,
+      );
+
+      if (bicicletaExistente) {
+        throw new AppError(
+          'Já existe uma bicicleta com esse número',
+          AppErrorType.RESOURCE_INVALID,
+        );
+      }
+    }
 
     const createdBicicleta = await this.bicicletaRepository.create({
       ...createBicicletaDto,
       status: bicicletaStatus,
-      numero: bicicletaNumero,
+      numero: createBicicletaDto.numero || generateRandomNumber(),
     });
 
     return BicicletaEntity.toDomain(createdBicicleta);
