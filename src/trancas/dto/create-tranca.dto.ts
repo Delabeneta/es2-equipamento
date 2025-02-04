@@ -4,12 +4,14 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Matches,
 } from 'class-validator';
 import { TrancaStatus } from '../domain/tranca';
 
 export class CreateTrancaDto {
   @IsNotEmpty()
   @IsString()
+  @Matches(/^\d{4}$/, { message: 'Ano deve ser um ano válido (YYYY).' })
   anoDeFabricacao: string;
 
   @IsNotEmpty()

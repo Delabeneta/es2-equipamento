@@ -45,7 +45,7 @@ export default class AppService {
     });
 
     const bicicleta1 = await bicicletaRepository.save({
-      numero: generateRandomNumber(),
+      numero: 12345,
       ano: '2020',
       modelo: 'Caloi',
       status: BicicletaStatus.DISPONIVEL,
@@ -53,15 +53,15 @@ export default class AppService {
     });
 
     const bicicleta2 = await bicicletaRepository.save({
-      numero: generateRandomNumber(),
       ano: '2020',
       modelo: 'Caloi',
       status: BicicletaStatus.REPARO_SOLICITADO,
       marca: 'Caloi',
+      numero: 12345,
     });
 
     await bicicletaRepository.save({
-      numero: generateRandomNumber(),
+      numero: 12345,
       ano: '2020',
       modelo: 'Caloi',
       status: BicicletaStatus.EM_USO,
@@ -69,7 +69,7 @@ export default class AppService {
     });
 
     await bicicletaRepository.save({
-      numero: generateRandomNumber(),
+      numero: 12345,
       ano: '2020',
       modelo: 'Caloi',
       status: BicicletaStatus.EM_REPARO,
@@ -78,7 +78,7 @@ export default class AppService {
     });
 
     const bicicleta5 = await bicicletaRepository.save({
-      numero: generateRandomNumber(),
+      numero: 12345,
       ano: '2020',
       modelo: 'Caloi',
       status: BicicletaStatus.EM_USO,
@@ -100,7 +100,7 @@ export default class AppService {
       modelo: 'Caloi',
       status: TrancaStatus.LIVRE,
       totemId: totem.id,
-      numero: generateRandomNumber(),
+      numero: 12345,
       localizacao: 'Rio de Janeiro',
     });
 
@@ -110,7 +110,7 @@ export default class AppService {
       status: TrancaStatus.OCUPADA,
       bicicletaId: bicicleta2.id,
       totemId: totem.id,
-      numero: generateRandomNumber(),
+      numero: 12345,
       localizacao: 'Rio de Janeiro',
     });
 
@@ -120,7 +120,7 @@ export default class AppService {
       status: TrancaStatus.OCUPADA,
       bicicletaId: bicicleta5.id,
       totemId: totem.id,
-      numero: generateRandomNumber(),
+      numero: 12345,
       localizacao: 'Rio de Janeiro',
     });
 
@@ -128,7 +128,7 @@ export default class AppService {
       anoDeFabricacao: '2020',
       modelo: 'Caloi',
       status: TrancaStatus.EM_REPARO,
-      numero: generateRandomNumber(),
+      numero: 12345,
       funcionarioId: 1,
       localizacao: 'Rio de Janeiro',
     });
@@ -138,7 +138,7 @@ export default class AppService {
       modelo: 'Caloi',
       status: TrancaStatus.REPARO_SOLICITADO,
       totemId: totem.id,
-      numero: generateRandomNumber(),
+      numero: 12345,
       localizacao: 'Rio de Janeiro',
     });
 
